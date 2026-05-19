@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
+import AssignAyahFlipCard, {
+  type AssignAyahFlipCardRef,
+} from "@/components/fbg/AssignAyahFlipCard";
 import styles from "@/components/fbg/fbg.module.css";
 import ListenButton from "@/components/fbg/ListenButton";
-import ReflectSection from "@/components/fbg/ReflectSection";
 import TafsirButton from "@/components/fbg/TafsirButton";
-import GlassCard from "@/components/fbg/ui/GlassCard";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
 import ui from "@/components/fbg/ui/ui.module.css";
 import {
@@ -75,6 +76,12 @@ function AssignContent() {
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const flipCardRef = useRef<AssignAyahFlipCardRef>(null);
+  const [flipUi, setFlipUi] = useState({
+    error: null as string | null,
+    isFlipped: false,
+    loading: false,
+  });
 
   useEffect(() => {
     if (!assignmentId) {
@@ -189,18 +196,30 @@ function AssignContent() {
 
       <p className={ui.contextBanner}>For: {contextLabel}</p>
 
-      <GlassCard>
-        <p className={styles.meta}>
-          {assignment.surahName} · {assignment.verseKey} · Ayah {assignment.ayahNumber}
-        </p>
-        <p className={styles.arabic}>{assignment.arabicText}</p>
-        <p className={styles.translation}>{assignment.translationText}</p>
-        <ReflectSection />
-      </GlassCard>
+      <AssignAyahFlipCard
+        assignment={assignment}
+        onFlipStateChange={setFlipUi}
+        ref={flipCardRef}
+      />
 
       <div className={ui.actionStubRow}>
         <ListenButton verseKey={assignment.verseKey} />
-        <TafsirButton verseKey={assignment.verseKey} />
+        <TafsirButton
+          error={flipUi.error}
+          isFlipped={flipUi.isFlipped}
+          loading={flipUi.loading}
+          onToggle={() => {
+            const card = flipCardRef.current;
+            if (!card) {
+              return;
+            }
+            if (card.isFlipped) {
+              card.flipToFront();
+            } else {
+              card.flipToTafsir();
+            }
+          }}
+        />
       </div>
 
       <button className={ui.primaryGradient} onClick={handleMemorize} type="button">
