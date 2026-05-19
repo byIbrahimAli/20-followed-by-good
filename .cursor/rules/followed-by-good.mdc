@@ -1,0 +1,25 @@
+---
+description: Followed By Good hackathon product rules
+alwaysApply: true
+---
+
+# Followed By Good
+
+- Product name is **Followed By Good** — never use "Athar" or other legacy names.
+- Hackathon deadline: **May 20, 2026**.
+
+## API contract (prize eligibility)
+
+- Use **≥1 Content API** (or Quran MCP) **and** **≥1 User API**.
+- Feature → API mapping:
+  - **Ayah Assignment Engine** → Quran MCP (search, verified text, tafsir)
+  - **Memorisation / listen & repeat** → Audio APIs
+  - **Daily check-ins** → Activity & Goals APIs
+  - **Streaks** → Streak Tracking API
+  - **Memorisation deck** → Collections API
+
+## Security
+
+- Never expose `CLIENT_SECRET`, refresh tokens, or user access tokens to the browser.
+- Prefer server-side SDK calls through `/api/*` route handlers.
+- Do not commit API keys; use `.env.local` and `${env:GOOGLE_STITCH_API_KEY}` for Stitch MCP.

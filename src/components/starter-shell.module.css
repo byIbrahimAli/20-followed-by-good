@@ -1,0 +1,384 @@
+.page {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 2rem 1.25rem 6rem;
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(120, 214, 196, 0.3), transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(124, 162, 235, 0.2), transparent 40%),
+    linear-gradient(160deg, #04112b, #060d20 58%, #07152f);
+  border: 1px solid rgba(150, 199, 255, 0.14);
+  border-radius: 28px;
+  padding: 2rem;
+}
+
+.badge {
+  color: #91f0df;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  color: #f6fbff;
+  font-size: clamp(1.6rem, 3.3vw, 2.5rem);
+  line-height: 1.2;
+  margin-top: 0.85rem;
+}
+
+.subtitle {
+  color: #d2e5ff;
+  margin-top: 0.8rem;
+  max-width: 64ch;
+}
+
+.nav {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.navLink,
+.navActive {
+  border-radius: 999px;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.9rem;
+  transition: all 150ms ease;
+}
+
+.navLink {
+  background: rgba(108, 146, 209, 0.12);
+  border: 1px solid rgba(108, 146, 209, 0.22);
+  color: #d1e4fb;
+}
+
+.navLink:hover {
+  border-color: rgba(160, 201, 255, 0.36);
+}
+
+.navActive {
+  background: linear-gradient(120deg, #98f0df, #8fd0ff);
+  border: 1px solid transparent;
+  color: #0b1636;
+  font-weight: 700;
+}
+
+.main {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.panel {
+  background: rgba(8, 17, 40, 0.86);
+  border: 1px solid rgba(120, 164, 235, 0.2);
+  border-radius: 24px;
+  padding: 1.35rem;
+}
+
+.panel h2 {
+  color: #f4f8ff;
+  font-size: 1.3rem;
+  margin-bottom: 0.45rem;
+}
+
+.panelHeader {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: space-between;
+}
+
+.rowActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.primaryLink {
+  background: linear-gradient(115deg, #94f0de, #8ec9fc);
+  border-radius: 999px;
+  color: #072645;
+  font-weight: 700;
+  padding: 0.5rem 0.95rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.62rem 0.9rem;
+}
+
+.primaryButton {
+  background: linear-gradient(110deg, #94f0de, #86ccf8);
+  color: #072645;
+}
+
+.secondaryButton {
+  background: rgba(126, 168, 234, 0.18);
+  color: #dcecff;
+}
+
+.textButton {
+  background: transparent;
+  border: 1px solid rgba(242, 138, 152, 0.44);
+  border-radius: 999px;
+  color: #ffc3cd;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+}
+
+.muted {
+  color: #9bb3d4;
+  font-size: 0.92rem;
+}
+
+.errorText {
+  color: #ff9fab;
+  font-size: 0.9rem;
+}
+
+.cardGrid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin-top: 0.95rem;
+}
+
+.card,
+.listCard,
+.feedCard {
+  background: rgba(3, 11, 28, 0.72);
+  border: 1px solid rgba(112, 153, 218, 0.19);
+  border-radius: 16px;
+  padding: 0.9rem;
+}
+
+.card h3,
+.results h3 {
+  color: #f5fbff;
+  font-size: 1.02rem;
+  margin-bottom: 0.45rem;
+}
+
+.card pre,
+.card p,
+.card a,
+.itemRow p,
+.feedCard p {
+  color: #d3e5ff;
+  margin-top: 0.2rem;
+  white-space: pre-wrap;
+}
+
+.card input,
+.card textarea,
+.inlineForm input {
+  background: rgba(2, 8, 22, 0.95);
+  border: 1px solid rgba(108, 147, 211, 0.25);
+  border-radius: 11px;
+  color: #e9f3ff;
+  display: block;
+  margin-bottom: 0.6rem;
+  padding: 0.56rem 0.65rem;
+  width: 100%;
+}
+
+.card textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.codeArea {
+  font-family: var(--font-space-mono), monospace;
+  min-height: 160px;
+}
+
+.inlineForm {
+  align-items: center;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: 1fr auto;
+  margin-top: 0.8rem;
+  max-width: 700px;
+}
+
+.results {
+  margin-top: 0.9rem;
+}
+
+.resultRow {
+  background: rgba(7, 17, 39, 0.8);
+  border: 1px solid rgba(102, 150, 226, 0.2);
+  border-radius: 12px;
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.resultRow strong {
+  color: #eaf4ff;
+  display: block;
+}
+
+.resultRow span {
+  color: #99b5da;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.listGrid {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-top: 0.85rem;
+}
+
+.listCard strong {
+  color: #f1f8ff;
+  display: block;
+}
+
+.listCard span {
+  color: #c4dcff;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.listCard small {
+  color: #94afce;
+  display: block;
+  margin-top: 0.45rem;
+}
+
+.stack {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.itemRow {
+  align-items: center;
+  background: rgba(6, 15, 35, 0.8);
+  border: 1px solid rgba(95, 138, 209, 0.2);
+  border-radius: 11px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.62rem 0.7rem;
+}
+
+.itemRow strong {
+  color: #f5fbff;
+}
+
+.readerCard {
+  margin-top: 0.85rem;
+}
+
+.readerCard h3 {
+  color: #f6fbff;
+}
+
+.verseRow {
+  background: rgba(5, 12, 30, 0.82);
+  border: 1px solid rgba(96, 137, 206, 0.24);
+  border-radius: 12px;
+  margin-top: 0.6rem;
+  padding: 0.75rem;
+}
+
+.verseMeta {
+  color: #9fbce2;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.arabic {
+  color: #f3f8ff;
+  direction: rtl;
+  font-family: var(--font-noto-arabic), serif;
+  font-size: 1.4rem;
+  line-height: 1.8;
+  margin: 0.1rem 0 0.45rem;
+  text-align: right;
+}
+
+.translation {
+  color: #bdd2ef;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.feedCard header {
+  align-items: baseline;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+}
+
+.feedCard small {
+  color: #8ea9cd;
+}
+
+.toastStack {
+  bottom: 1rem;
+  display: grid;
+  gap: 0.5rem;
+  pointer-events: none;
+  position: fixed;
+  right: 1rem;
+  width: min(420px, calc(100vw - 2rem));
+  z-index: 50;
+}
+
+.toastError,
+.toastSuccess {
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26);
+  color: #f7fcff;
+  font-weight: 600;
+  padding: 0.8rem 0.95rem;
+}
+
+.toastError {
+  background: rgba(141, 46, 70, 0.78);
+  border: 1px solid rgba(255, 164, 181, 0.38);
+}
+
+.toastSuccess {
+  background: rgba(36, 96, 116, 0.82);
+  border: 1px solid rgba(151, 247, 228, 0.4);
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 1.2rem 0.9rem 5.4rem;
+  }
+
+  .hero {
+    border-radius: 22px;
+    padding: 1.3rem;
+  }
+
+  .panel {
+    border-radius: 18px;
+    padding: 1rem;
+  }
+
+  .inlineForm {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "quran": {
+      "url": "https://mcp.quran.ai"
+    },
+    "stitch": {
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "${env:GOOGLE_STITCH_API_KEY}"
+      }
+    }
+  }
+}
