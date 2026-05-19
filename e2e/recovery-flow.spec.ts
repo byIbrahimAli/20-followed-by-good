@@ -86,7 +86,8 @@ test.describe("recovery flow", () => {
     await page.getByRole("button", { name: "Begin memorizing" }).click();
 
     await expect(page.getByText(/^Memorize$/).first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText("Type to recall (translation)")).toBeVisible();
+    await page.getByRole("tab", { name: "Type (translation)" }).click();
+    await expect(page.getByPlaceholder(/Type what you remember/i)).toBeVisible();
     await page.getByRole("link", { name: "Home" }).click();
 
     await expect(page.getByText(/What slipped today/i)).toBeVisible({

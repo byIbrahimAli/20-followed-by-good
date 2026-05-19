@@ -48,3 +48,13 @@ export const computeRetentionPercent = (
   intervalIndex: number,
   maxIndex = SRS_INTERVALS_DAYS.length - 1,
 ): number => Math.round((intervalIndex / maxIndex) * 100);
+
+export const maxSrsIntervalIndex = (): number => SRS_INTERVALS_DAYS.length - 1;
+
+export const masteredSessionSchedule = (
+  fromDate = new Date().toISOString().slice(0, 10),
+): { intervalIndex: number; lastGrade: "easy"; nextDue: string } => {
+  const intervalIndex = maxSrsIntervalIndex();
+  const scheduled = scheduleNextDue(intervalIndex, fromDate);
+  return { ...scheduled, lastGrade: "easy" };
+};

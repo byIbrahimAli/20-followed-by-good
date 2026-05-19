@@ -1,5 +1,7 @@
 "use client";
 
+import { masteredSessionSchedule } from "@/lib/fbg/srs";
+
 export type AssignmentStatus = "pending" | "memorizing" | "done";
 export type SrsGrade = "easy" | "hard" | null;
 
@@ -304,6 +306,55 @@ export const addSrsSession = (
 
 export const getSrsSession = (id: string): SrsSession | null =>
   readStore().srsSessions.find((item) => item.id === id) ?? null;
+
+export interface SrsSessionSnapshot {
+  intervalIndex: number;
+  lastGrade: SrsGrade;
+  nextDue: string;
+  assignmentStatus?: AssignmentStatus;
+}
+
+export const snapshotSrsSession = (session: SrsSession): SrsSessionSnapshot => {
+  const snapshot: SrsSessionSnapshot = {
+    intervalIndex: session.intervalIndex,
+    lastGrade: session.lastGrade,
+    nextDue: session.nextDue,
+  };
+
+  if (session.assignmentId) {
+    const assignment = getAssignment(session.assignmentId);
+    if (assignment) {
+      snapshot.assignmentStatus = assignment.status;
+    }
+  }
+
+  return snapshot;
+};
+
+export const markSrsSessionMastered = (session: SrsSession): SrsSession | null => {
+  const patch = masteredSessionSchedule();
+  const updated = updateSrsSession(session.id, patch);
+  if (updated && session.assignmentId) {
+    updateAssignment(session.assignmentId, { status: "done" });
+  }
+  return updated;
+};
+
+export const restoreSrsSessionSnapshot = (
+  sessionId: string,
+  snapshot: SrsSessionSnapshot,
+  assignmentId?: string,
+): SrsSession | null => {
+  const restored = updateSrsSession(sessionId, {
+    intervalIndex: snapshot.intervalIndex,
+    lastGrade: snapshot.lastGrade,
+    nextDue: snapshot.nextDue,
+  });
+  if (assignmentId && snapshot.assignmentStatus) {
+    updateAssignment(assignmentId, { status: snapshot.assignmentStatus });
+  }
+  return restored;
+};
 
 export const updateSrsSession = (
   id: string,

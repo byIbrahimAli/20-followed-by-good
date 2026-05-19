@@ -405,8 +405,103 @@
   border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
   border-radius: var(--fbg-radius-card);
   padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  min-height: 10rem;
+}
+
+.memorizeLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-bottom: var(--fbg-section-gap);
-  min-height: 12rem;
+}
+
+.memorizeCardBlock {
+  flex-shrink: 0;
+}
+
+.memorizeRecallBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.segmentTabBar {
+  display: flex;
+  gap: 0.35rem;
+  background: var(--fbg-bg-soft);
+  border: 1px solid var(--fbg-outline-variant);
+  border-radius: 999px;
+  padding: 0.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.segmentTab,
+.segmentTabActive {
+  flex: 1;
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--fbg-fg-muted);
+}
+
+.segmentTabActive {
+  background: var(--fbg-primary-dim);
+  color: var(--fbg-primary);
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.25rem 0 0.35rem;
+}
+
+.progressLabel {
+  font-size: 0.75rem;
+  color: var(--fbg-fg-muted);
+  margin: 0;
+}
+
+.progressPercent {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fbg-primary);
+  margin: 0;
+}
+
+.undoBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--fbg-radius-card);
+  background: rgba(149, 211, 186, 0.12);
+  border: 1px solid color-mix(in srgb, var(--fbg-primary) 30%, var(--fbg-outline-variant));
+  font-size: 0.85rem;
+  color: var(--fbg-fg-base);
+}
+
+.undoBtn {
+  flex-shrink: 0;
+  border: 1px solid var(--fbg-primary);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  background: transparent;
+  color: var(--fbg-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .srsInputBar {
