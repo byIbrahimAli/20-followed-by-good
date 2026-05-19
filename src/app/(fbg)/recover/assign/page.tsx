@@ -5,6 +5,8 @@ import { Suspense, useEffect, useState } from "react";
 
 import styles from "@/components/fbg/fbg.module.css";
 import ListenButton from "@/components/fbg/ListenButton";
+import ReflectSection from "@/components/fbg/ReflectSection";
+import TafsirButton from "@/components/fbg/TafsirButton";
 import GlassCard from "@/components/fbg/ui/GlassCard";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
 import ui from "@/components/fbg/ui/ui.module.css";
@@ -16,6 +18,11 @@ import {
   upsertAssignment,
   type Assignment,
 } from "@/lib/fbg/store";
+import {
+  fetchVerseFields,
+  isLikelyIncompleteVerse,
+  mergeHydratedVerse,
+} from "@/lib/fbg/hydrate-assignment-verse";
 import { scheduleNextDue } from "@/lib/fbg/srs";
 
 async function fetchAssignmentFromApi(id: string): Promise<Assignment | null> {
@@ -68,7 +75,6 @@ function AssignContent() {
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!assignmentId) {
@@ -76,27 +82,38 @@ function AssignContent() {
       return;
     }
 
+    const hydrateVerse = async (current: Assignment): Promise<Assignment> => {
+      const verse = await fetchVerseFields(current.verseKey);
+      if (!verse) {
+        return current;
+      }
+
+      if (
+        !isLikelyIncompleteVerse(current.arabicText) &&
+        verse.arabicText === current.arabicText
+      ) {
+        return current;
+      }
+
+      const merged = mergeHydratedVerse(current, verse);
+      upsertAssignment(merged);
+      return merged;
+    };
+
     const load = async () => {
-      const fromStore = getAssignment(assignmentId);
-      if (fromStore) {
-        setAssignment(fromStore);
-        setLoading(false);
-        return;
+      let current =
+        getAssignment(assignmentId) ?? loadAssignmentFromBackup(assignmentId);
+
+      if (!current) {
+        current = await fetchAssignmentFromApi(assignmentId);
       }
 
-      const fromBackup = loadAssignmentFromBackup(assignmentId);
-      if (fromBackup) {
-        upsertAssignment(fromBackup);
-        setAssignment(fromBackup);
-        setLoading(false);
-        return;
+      if (current) {
+        upsertAssignment(current);
+        const hydrated = await hydrateVerse(current);
+        setAssignment(hydrated);
       }
 
-      const fromApi = await fetchAssignmentFromApi(assignmentId);
-      if (fromApi) {
-        upsertAssignment(fromApi);
-        setAssignment(fromApi);
-      }
       setLoading(false);
     };
 
@@ -123,34 +140,26 @@ function AssignContent() {
     router.push(`/memorize/${session.id}`);
   };
 
-  const handleSaveLater = async () => {
+  const handleSaveLater = () => {
     if (!assignment) {
       return;
     }
 
     setSaving(true);
-    setMessage(null);
-    updateAssignment(assignment.id, { status: "pending" });
 
-    try {
-      const response = await fetch("/api/collections", {
-        body: JSON.stringify({ name: `Recovery · ${assignment.verseKey}` }),
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-      });
+    const scheduled = scheduleNextDue(0);
+    addSrsSession({
+      arabicText: assignment.arabicText,
+      assignmentId: assignment.id,
+      nextDue: scheduled.nextDue,
+      intervalIndex: scheduled.intervalIndex,
+      surahName: assignment.surahName,
+      translationText: assignment.translationText,
+      verseKey: assignment.verseKey,
+    });
 
-      const payload = (await response.json()) as { message?: string; ok?: boolean };
-      if (payload.ok) {
-        setMessage("Saved locally and synced to your collections.");
-      } else {
-        setMessage("Saved on this device. Sign in to sync collections.");
-      }
-    } catch {
-      setMessage("Saved on this device.");
-    } finally {
-      setSaving(false);
-    }
+    updateAssignment(assignment.id, { status: "memorizing" });
+    router.push("/?saved=1");
   };
 
   if (!assignmentId) {
@@ -186,20 +195,13 @@ function AssignContent() {
         </p>
         <p className={styles.arabic}>{assignment.arabicText}</p>
         <p className={styles.translation}>{assignment.translationText}</p>
-        <p className={styles.tafsir}>{assignment.tafsirSnippet}</p>
-        <p className={styles.meta}>
-          <strong>Reflect:</strong> {assignment.reflectionPrompt}
-        </p>
+        <ReflectSection />
       </GlassCard>
 
       <div className={ui.actionStubRow}>
         <ListenButton verseKey={assignment.verseKey} />
-        <button className={ui.stubBtn} type="button">
-          <span className={ui.materialIcon}>menu_book</span> Tafsir
-        </button>
+        <TafsirButton verseKey={assignment.verseKey} />
       </div>
-
-      {message ? <p className={styles.banner}>{message}</p> : null}
 
       <button className={ui.primaryGradient} onClick={handleMemorize} type="button">
         Begin memorizing
@@ -212,7 +214,6 @@ function AssignContent() {
       >
         {saving ? "Saving…" : "Save for later"}
       </button>
-
     </>
   );
 }

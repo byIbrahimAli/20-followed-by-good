@@ -1,12 +1,10 @@
 import "server-only";
 
-import { getConfig } from "@/lib/env";
-import { DEFAULT_OAUTH2_BASE_URL } from "@/lib/oauth";
+import { contentApiFetch } from "@/lib/fbg/content-http";
 import { createClients } from "@/lib/sdk";
 import type { StoredSession } from "@/lib/session/store";
 
 const VERSES_CDN = "https://verses.quran.com";
-const CONTENT_GATEWAY_DEFAULT = "https://apis.quran.foundation";
 
 export const getDefaultRecitationId = (): number => {
   const raw = process.env.DEFAULT_RECITER_ID;
@@ -91,81 +89,12 @@ const resolveSdkLoader = (
   return null;
 };
 
-const encodeBasicAuth = (clientId: string, clientSecret: string): string => {
-  const raw = `${clientId}:${clientSecret}`;
-  if (typeof Buffer !== "undefined") {
-    return Buffer.from(raw).toString("base64");
-  }
-
-  if (typeof globalThis.btoa === "function") {
-    return globalThis.btoa(raw);
-  }
-
-  throw new Error("No base64 encoder available for content API auth.");
-};
-
-const fetchContentAccessToken = async (): Promise<string> => {
-  const config = getConfig();
-  const oauthBase =
-    config.services?.oauth2BaseUrl ?? config.oauth2BaseUrl ?? DEFAULT_OAUTH2_BASE_URL;
-
-  const response = await fetch(`${oauthBase}/oauth2/token`, {
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-      scope: "content",
-    }),
-    headers: {
-      Accept: "application/json",
-      Authorization: `Basic ${encodeBasicAuth(config.clientId, config.clientSecret)}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Token request failed: ${response.status} ${response.statusText}`);
-  }
-
-  const payload = (await response.json()) as { access_token?: string };
-  if (!payload.access_token) {
-    throw new Error("Token response did not include access_token.");
-  }
-
-  return payload.access_token;
-};
-
-const resolveContentGatewayRoot = (): string => {
-  const config = getConfig();
-  const gateway = config.services?.gatewayUrl;
-  if (gateway) {
-    return gateway.replace(/\/$/, "");
-  }
-
-  const contentBase = config.services?.contentBaseUrl;
-  if (contentBase) {
-    return contentBase.replace(/\/content\/?$/, "").replace(/\/$/, "");
-  }
-
-  return CONTENT_GATEWAY_DEFAULT;
-};
-
 const loadViaHttp = async (
   verseKey: string,
   recitationId: string,
 ): Promise<VerseRecitationResponse> => {
-  const config = getConfig();
-  const gatewayRoot = resolveContentGatewayRoot();
-  const accessToken = await fetchContentAccessToken();
   const path = `/content/api/v4/recitations/${encodeURIComponent(recitationId)}/by_ayah/${encodeURIComponent(verseKey)}`;
-  const url = new URL(path, `${gatewayRoot}/`);
-
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "x-auth-token": accessToken,
-      "x-client-id": config.clientId,
-    },
-  });
+  const response = await contentApiFetch(path);
 
   if (!response.ok) {
     throw new Error(`Content audio request failed: ${response.status} ${response.statusText}`);
@@ -179,20 +108,16 @@ const loadVerseRecitationPayload = async (
   verseKey: string,
   recitationId: string,
 ): Promise<VerseRecitationResponse> => {
-  const sdkLoader = resolveSdkLoader(serverClient);
-  if (sdkLoader) {
-    try {
-      return await sdkLoader(verseKey, recitationId);
-    } catch (sdkError) {
-      try {
-        return await loadViaHttp(verseKey, recitationId);
-      } catch {
-        throw sdkError;
-      }
+  try {
+    return await loadViaHttp(verseKey, recitationId);
+  } catch (httpError) {
+    const sdkLoader = resolveSdkLoader(serverClient);
+    if (!sdkLoader) {
+      throw httpError;
     }
-  }
 
-  return loadViaHttp(verseKey, recitationId);
+    return sdkLoader(verseKey, recitationId);
+  }
 };
 
 export const loadVerseAudio = async (

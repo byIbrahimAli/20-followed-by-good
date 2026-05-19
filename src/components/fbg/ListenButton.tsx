@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import ui from "@/components/fbg/ui/ui.module.css";
+import VerseActionButton from "@/components/fbg/VerseActionButton";
 
 type ListenState = "idle" | "loading" | "playing" | "paused" | "error";
 
@@ -152,18 +152,18 @@ export default function ListenButton({ className, verseKey }: ListenButtonProps)
       ? "hourglass_empty"
       : state === "playing"
         ? "pause"
-        : "headphones";
+        : "volume_up";
 
   return (
-    <button
-      aria-label={label}
-      className={className ?? ui.stubBtn}
+    <VerseActionButton
+      className={className}
       disabled={state === "loading"}
+      icon={icon}
+      label={label}
       onClick={() => void handleClick()}
       title={errorMessage ?? undefined}
-      type="button"
     >
-      <span className={ui.materialIcon}>{icon}</span> {label}
-    </button>
+      {label}
+    </VerseActionButton>
   );
 }

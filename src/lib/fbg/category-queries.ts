@@ -19,7 +19,7 @@ export const CATEGORY_FALLBACK_VERSE: Record<string, string> = {
   Speech: "49:12",
   Honesty: "9:119",
   "Lower Gaze": "24:30",
-  "Mindful Time": "103:1",
+  "Mindful Time": "63:9",
   Contentment: "4:32",
   Gratitude: "14:7",
   Family: "17:23",
@@ -113,15 +113,19 @@ export const DEMO_VERSES: Record<string, DemoVerse> = {
     verseKey: "24:30",
     surahName: "An-Nur",
     ayahNumber: 30,
-    arabicText: "قُل لِّلْمُؤْمِنِينَ يَغُضُّوا مِنْ أَبْصَارِهِمْ",
-    translationText: "Tell the believing men to lower their gaze.",
+    arabicText:
+      "قُل لِّلْمُؤْمِنِينَ يَغُضُّوا مِنْ أَبْصَارِهِمْ وَيَحْفَظُوا فُرُوجَهُمْ ۚ ذَٰلِكَ أَزْكَىٰ لَهُمْ ۗ إِنَّ اللَّهَ خَبِيرٌ بِمَا يَصْنَعُونَ",
+    translationText:
+      "Tell the believing men to reduce some of their vision and guard their private parts. That is purer for them. Indeed, Allah is Acquainted with what they do.",
   },
-  "103:1": {
-    verseKey: "103:1",
-    surahName: "Al-Asr",
-    ayahNumber: 1,
-    arabicText: "وَالْعَصْرِ",
-    translationText: "By time.",
+  "63:9": {
+    verseKey: "63:9",
+    surahName: "Al-Munafiqun",
+    ayahNumber: 9,
+    arabicText:
+      "يَا أَيُّهَا الَّذِينَ آمَنُوا لَا تُلْهِكُمْ أَمْوَالُكُمْ وَلَا أَوْلَادُكُمْ عَن ذِكْرِ اللَّهِ ۚ وَمَن يَفْعَلْ ذَٰلِكَ فَأُولَٰئِكَ هُمُ الْخَاسِرُونَ",
+    translationText:
+      "O you who have believed, let not your wealth and your children divert you from remembrance of Allah. And whoever does that — then those are the losers.",
   },
 };
 

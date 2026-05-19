@@ -1,6 +1,7 @@
 import "server-only";
 
 import { DEFAULT_BOOKMARK_MUSHAF, DEFAULT_FEED_QUERY, LIST_PREVIEW_LIMIT, SESSION_EXPIRED_MESSAGE } from "@/lib/constants";
+import { contentApiFetch } from "@/lib/fbg/content-http";
 import { getConfig } from "@/lib/env";
 import { decodeJwt } from "@/lib/oauth";
 import type { StoredSession } from "@/lib/session/store";
@@ -501,44 +502,155 @@ export const loadSearchData = async (
   }
 };
 
+/** Prefer full-ayah Uthmani text; join per-word payloads when the API omits verse-level text. */
+export const extractVerseArabicText = (verse: JsonObject): string | null => {
+  const direct =
+    asNullableString(verse.textUthmani) ??
+    asNullableString(verse.text_uthmani) ??
+    asNullableString(verse.textUthmaniSimple) ??
+    asNullableString(verse.text_uthmani_simple) ??
+    asNullableString(verse.text);
+
+  if (direct && direct.trim().includes(" ")) {
+    return direct.trim();
+  }
+
+  const words = toArray(verse.words);
+  if (words.length > 0) {
+    const joined = words
+      .map((word) => {
+        const payload = asObject(word);
+        return asNullableString(
+          payload.textUthmani ?? payload.text ?? payload.text_uthmani,
+        );
+      })
+      .filter((part): part is string => Boolean(part))
+      .join(" ")
+      .trim();
+
+    if (joined) {
+      return joined;
+    }
+  }
+
+  return direct?.trim() || null;
+};
+
+const loadVerseByKeyViaHttp = async (
+  verseKey: string,
+  translationIds: number[],
+  includeWords: boolean,
+): Promise<JsonObject | null> => {
+  const params = new URLSearchParams({
+    fields: "text_uthmani",
+    words: includeWords ? "true" : "false",
+  });
+  for (const id of translationIds) {
+    params.append("translations", String(id));
+  }
+
+  const path = `/content/api/v4/verses/by_key/${encodeURIComponent(verseKey)}?${params.toString()}`;
+  const response = await contentApiFetch(path);
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = (await response.json()) as JsonObject;
+  return asObject(payload.verse ?? payload);
+};
+
 export const loadVerseByKey = async (
   session: StoredSession,
   verseKey: string,
 ): Promise<(ReaderVerse & { chapterName: string }) | null> => {
   const config = getConfig();
-  const { serverClient } = await createClients(session);
   const chapterId = verseKey.split(":")[0];
   if (!chapterId) {
     return null;
   }
 
-  const content = serverClient.content?.v4;
-  const byKey = content?.verses?.byKey;
-  if (typeof byKey !== "function") {
-    return null;
+  let verse: JsonObject | null = null;
+  let chapterName = `Chapter ${chapterId}`;
+
+  try {
+    verse = await loadVerseByKeyViaHttp(verseKey, config.translationIds, false);
+    if (verse && !extractVerseArabicText(verse)?.includes(" ")) {
+      const withWords = await loadVerseByKeyViaHttp(verseKey, config.translationIds, true);
+      if (withWords) {
+        verse = withWords;
+      }
+    }
+
+    const chapterResponse = await contentApiFetch(
+      `/content/api/v4/chapters/${encodeURIComponent(chapterId)}`,
+    );
+    if (chapterResponse.ok) {
+      const chapterPayload = asObject(await chapterResponse.json());
+      const chapter = asObject(chapterPayload.chapter ?? chapterPayload);
+      chapterName = asString(chapter.nameSimple, chapterName);
+    }
+  } catch {
+    verse = null;
   }
 
-  const [verseResponse, chapterResponse] = await Promise.all([
-    byKey(verseKey, {
-      fields: { textUthmani: true },
-      translations: config.translationIds,
-      words: false,
-    }),
-    content.chapters.get(chapterId),
-  ]);
+  if (!verse) {
+    const { serverClient } = await createClients(session);
+    const content = serverClient.content?.v4;
+    const byKey = content?.verses?.byKey;
+    if (typeof byKey !== "function") {
+      return null;
+    }
 
-  const verse = asObject(asObject(verseResponse).verse ?? verseResponse);
-  const chapterPayload = asObject(chapterResponse);
-  const chapter = asObject(chapterPayload.chapter ?? chapterPayload);
-  const arabicText = asString(verse.textUthmani);
+    const fetchVerse = (includeWords: boolean) =>
+      byKey(verseKey, {
+        fields: { textUthmani: true },
+        translations: config.translationIds,
+        words: includeWords,
+        wordFields: includeWords ? { textUthmani: true } : undefined,
+      });
 
+    const [verseResponse, chapterResponse] = await Promise.all([
+      fetchVerse(false),
+      content.chapters.get(chapterId),
+    ]);
+
+    verse = asObject(asObject(verseResponse).verse ?? verseResponse);
+    let arabicText = extractVerseArabicText(verse);
+
+    if (!arabicText || (!arabicText.includes(" ") && toArray(verse.words).length === 0)) {
+      const withWords = await fetchVerse(true);
+      verse = asObject(asObject(withWords).verse ?? withWords);
+      arabicText = extractVerseArabicText(verse);
+    }
+
+    if (!arabicText) {
+      return null;
+    }
+
+    const chapterPayload = asObject(chapterResponse);
+    const chapter = asObject(chapterPayload.chapter ?? chapterPayload);
+    chapterName = asString(chapter.nameSimple, chapterName);
+
+    return {
+      arabicText,
+      chapterName,
+      id: asString(
+        verse.id ?? verse.verseKey ?? `${chapterId}-${asString(verse.verseNumber, "verse")}`,
+      ),
+      translationText: getTranslationText(verse.translations, config.translationIds),
+      verseKey: asNullableString(verse.verseKey) ?? verseKey,
+      verseNumber: asNullableNumber(verse.verseNumber),
+    };
+  }
+
+  const arabicText = extractVerseArabicText(verse);
   if (!arabicText) {
     return null;
   }
 
   return {
     arabicText,
-    chapterName: asString(chapter.nameSimple, `Chapter ${chapterId}`),
+    chapterName,
     id: asString(
       verse.id ?? verse.verseKey ?? `${chapterId}-${asString(verse.verseNumber, "verse")}`,
     ),

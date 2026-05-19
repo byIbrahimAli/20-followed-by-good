@@ -19,6 +19,17 @@ const mockAssignment = {
 test.describe("recovery flow", () => {
   test.beforeEach(async ({ page }) => {
     if (process.env.PLAYWRIGHT_MOCK_API === "1") {
+      await page.route("**/api/fbg/tafsir**", async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            ok: true,
+            text: "Good and evil are not equal in the sight of Allah.",
+          }),
+        });
+      });
+
       await page.route("**/api/fbg/audio**", async (route) => {
         await route.fulfill({
           status: 502,
@@ -88,5 +99,25 @@ test.describe("recovery flow", () => {
     await expect(page.getByRole("heading", { name: "Memorize" })).toBeVisible();
     await expect(page.getByText("Avg progress")).toBeVisible();
     await expect(page.getByText(/% retention/).first()).toBeVisible();
+  });
+
+  test("save for later adds to memorize and shows home notice", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.getByPlaceholder(/Name it gently/i).fill("I lost my temper at work");
+    await page.getByRole("button", { name: "Continue" }).click();
+
+    await expect(page.getByText("Good and evil are not equal.")).toBeVisible({
+      timeout: 15_000,
+    });
+
+    await page.getByRole("button", { name: "Save for later" }).click();
+
+    await expect(
+      page.getByText(/Saved to Memorize — review it when you're ready/i),
+    ).toBeVisible({ timeout: 10_000 });
+
+    await page.getByRole("link", { name: "Memorize" }).click();
+    await expect(page.getByText(/SRS review due|Anger/).first()).toBeVisible();
   });
 });

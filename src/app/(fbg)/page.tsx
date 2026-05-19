@@ -27,6 +27,7 @@ function DashboardContent() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedNotice, setSavedNotice] = useState(false);
   const { data: bootstrap } = useSWR("fbg-bootstrap", fetchBootstrap);
 
   const chips = getTaxonomyChips(getRecentCategories());
@@ -37,6 +38,15 @@ function DashboardContent() {
       setText(q);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (searchParams.get("saved") !== "1") {
+      return;
+    }
+
+    setSavedNotice(true);
+    router.replace("/", { scroll: false });
+  }, [router, searchParams]);
 
   const handleContinue = async () => {
     const trimmed = text.trim();
@@ -63,6 +73,12 @@ function DashboardContent() {
   return (
     <>
       <TopAppBar title="Followed By Good" />
+
+      {savedNotice ? (
+        <p className={styles.bannerSuccess} role="status">
+          Saved to Memorize — review it when you&apos;re ready.
+        </p>
+      ) : null}
 
       <GlassCard id="moment">
         <p className={ui.sectionLabel}>What slipped today?</p>

@@ -96,35 +96,40 @@ describe("loadVerseAudio", () => {
     expect(findVerseRecitationsByKey).toHaveBeenCalledWith("2:255", "3");
   });
 
-  it("proxies via content HTTP when SDK audio is unavailable", async () => {
+  it("loads via content HTTP before SDK", async () => {
     mocks.createClients.mockResolvedValue({
       serverClient: {
         content: { v4: {} },
       },
     });
 
-    mocks.fetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ access_token: "app-token" }),
-      })
-      .mockResolvedValueOnce({
+    mocks.fetch.mockImplementation(async (url: string) => {
+      if (String(url).includes("/oauth2/token")) {
+        return {
+          ok: true,
+          json: async () => ({ access_token: "app-token", expires_in: 3600 }),
+        };
+      }
+
+      return {
         ok: true,
         json: async () => ({
           audio_files: [{ url: "reciter/002255.mp3" }],
         }),
-      });
+      };
+    });
 
     const result = await loadVerseAudio({} as never, "2:255");
 
     expect(result).toEqual({
       audioUrl: "https://verses.quran.com/reciter/002255.mp3",
     });
-    expect(mocks.fetch).toHaveBeenCalledTimes(2);
-    expect(String(mocks.fetch.mock.calls[1]?.[0])).toContain(
-      "/content/api/v4/recitations/7/by_ayah/2%3A255",
+
+    const audioCall = mocks.fetch.mock.calls.find((call) =>
+      String(call[0]).includes("/content/api/v4/recitations/7/by_ayah/2%3A255"),
     );
-    expect(mocks.fetch.mock.calls[1]?.[1]).toMatchObject({
+    expect(audioCall).toBeTruthy();
+    expect(audioCall?.[1]).toMatchObject({
       headers: {
         "x-auth-token": "app-token",
         "x-client-id": "client-id",

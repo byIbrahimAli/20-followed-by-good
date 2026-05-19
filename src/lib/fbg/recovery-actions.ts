@@ -1,8 +1,14 @@
+import {
+  fetchVerseFields,
+  isLikelyIncompleteVerse,
+  mergeHydratedVerse,
+} from "@/lib/fbg/hydrate-assignment-verse";
 import { extractCategory } from "@/lib/fbg/slip-taxonomy";
 import {
   addAssignment,
   addSlip,
   persistAssignmentBackup,
+  upsertAssignment,
   type Assignment,
 } from "@/lib/fbg/store";
 
@@ -48,13 +54,20 @@ export const continueToAyah = async (
   }
 
   const serverId = payload.assignment.assignmentId;
-  const assignment = addAssignment(
+  let assignment = addAssignment(
     {
       ...payload.assignment,
       slipId: slip.id,
     },
     serverId,
   );
+
+  if (isLikelyIncompleteVerse(assignment.arabicText)) {
+    const verse = await fetchVerseFields(assignment.verseKey);
+    if (verse) {
+      assignment = upsertAssignment(mergeHydratedVerse(assignment, verse));
+    }
+  }
 
   persistAssignmentBackup(assignment);
   return assignment;
