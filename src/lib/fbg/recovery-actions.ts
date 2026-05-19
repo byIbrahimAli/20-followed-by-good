@@ -47,10 +47,19 @@ export const continueToAyah = async (
     method: "POST",
   });
 
-  const payload = (await response.json()) as AssignApiPayload;
+  let payload: AssignApiPayload;
+  try {
+    payload = (await response.json()) as AssignApiPayload;
+  } catch {
+    throw new Error(
+      response.ok
+        ? "Assignment service returned an invalid response."
+        : `Assignment failed (${response.status}). Check server environment variables.`,
+    );
+  }
 
   if (!response.ok || !payload.assignment) {
-    throw new Error(payload.message ?? "Assignment failed.");
+    throw new Error(payload.message ?? `Assignment failed (${response.status}).`);
   }
 
   const serverId = payload.assignment.assignmentId;

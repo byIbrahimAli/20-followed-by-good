@@ -2,8 +2,11 @@ import "server-only";
 
 import { getConfig } from "@/lib/env";
 import { DEFAULT_OAUTH2_BASE_URL } from "@/lib/oauth";
+import { ensureHttpsOrigin } from "@/lib/resolve-app-base-url";
 
 const CONTENT_GATEWAY_DEFAULT = "https://apis.quran.foundation";
+
+export { ensureHttpsOrigin };
 
 const encodeBasicAuth = (clientId: string, clientSecret: string): string => {
   const raw = `${clientId}:${clientSecret}`;
@@ -26,8 +29,9 @@ export const fetchContentAccessToken = async (): Promise<string> => {
   }
 
   const config = getConfig();
-  const oauthBase =
-    config.services?.oauth2BaseUrl ?? config.oauth2BaseUrl ?? DEFAULT_OAUTH2_BASE_URL;
+  const oauthBase = ensureHttpsOrigin(
+    config.services?.oauth2BaseUrl ?? config.oauth2BaseUrl ?? DEFAULT_OAUTH2_BASE_URL,
+  );
 
   const response = await fetch(`${oauthBase}/oauth2/token`, {
     body: new URLSearchParams({
@@ -68,12 +72,13 @@ export const resolveContentGatewayRoot = (): string => {
   const config = getConfig();
   const gateway = config.services?.gatewayUrl;
   if (gateway) {
-    return gateway.replace(/\/$/, "");
+    return ensureHttpsOrigin(gateway);
   }
 
   const contentBase = config.services?.contentBaseUrl;
   if (contentBase) {
-    return contentBase.replace(/\/content\/?$/, "").replace(/\/$/, "");
+    const root = contentBase.replace(/\/content\/?$/, "").replace(/\/$/, "");
+    return ensureHttpsOrigin(root);
   }
 
   return CONTENT_GATEWAY_DEFAULT;
@@ -87,7 +92,15 @@ export const contentApiFetch = async (
   const gatewayRoot = resolveContentGatewayRoot();
   const accessToken = await fetchContentAccessToken();
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = new URL(normalizedPath, `${gatewayRoot}/`);
+
+  let url: URL;
+  try {
+    url = new URL(normalizedPath, `${gatewayRoot}/`);
+  } catch {
+    throw new Error(
+      `Invalid content API URL (check GATEWAY_URL / CONTENT_BASE_URL). Gateway: ${gatewayRoot}`,
+    );
+  }
 
   return fetch(url, {
     ...init,

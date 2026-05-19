@@ -58,7 +58,9 @@ function DashboardContent() {
     setError(null);
     try {
       const assignment = await continueToAyah(trimmed);
-      router.push(`/recover/assign?id=${assignment.id}`);
+      router.push(
+        `/recover/assign?id=${encodeURIComponent(assignment.id)}`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not assign ayah.");
     } finally {
@@ -67,7 +69,13 @@ function DashboardContent() {
   };
 
   const appendChip = (chip: string) => {
+    setError(null);
     setText((prev) => (prev ? `${prev} ${chip}` : chip));
+  };
+
+  const handleTextChange = (value: string) => {
+    setError(null);
+    setText(value);
   };
 
   return (
@@ -84,7 +92,7 @@ function DashboardContent() {
         <p className={ui.sectionLabel}>What slipped today?</p>
         <textarea
           className={ui.slipTextarea}
-          onChange={(event) => setText(event.target.value)}
+          onChange={(event) => handleTextChange(event.target.value)}
           placeholder="Name it gently — no shame, just honesty…"
           value={text}
         />

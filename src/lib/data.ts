@@ -476,7 +476,18 @@ export const loadSearchData = async (
     };
   }
 
-  const { serverClient } = await createClients(session);
+  let serverClient: Awaited<ReturnType<typeof createClients>>["serverClient"];
+  try {
+    ({ serverClient } = await createClients(session));
+  } catch (error) {
+    return {
+      error: formatError(error),
+      navigationItems: [],
+      query: normalizedQuery,
+      verseItems: [],
+    };
+  }
+
   const mode = options.useAdvanced
     ? await getSearchModeAdvanced()
     : await getSearchModeQuick();
@@ -595,53 +606,57 @@ export const loadVerseByKey = async (
   }
 
   if (!verse) {
-    const { serverClient } = await createClients(session);
-    const content = serverClient.content?.v4;
-    const byKey = content?.verses?.byKey;
-    if (typeof byKey !== "function") {
+    try {
+      const { serverClient } = await createClients(session);
+      const content = serverClient.content?.v4;
+      const byKey = content?.verses?.byKey;
+      if (typeof byKey !== "function") {
+        return null;
+      }
+
+      const fetchVerse = (includeWords: boolean) =>
+        byKey(verseKey, {
+          fields: { textUthmani: true },
+          translations: config.translationIds,
+          words: includeWords,
+          wordFields: includeWords ? { textUthmani: true } : undefined,
+        });
+
+      const [verseResponse, chapterResponse] = await Promise.all([
+        fetchVerse(false),
+        content.chapters.get(chapterId),
+      ]);
+
+      verse = asObject(asObject(verseResponse).verse ?? verseResponse);
+      let arabicText = extractVerseArabicText(verse);
+
+      if (!arabicText || (!arabicText.includes(" ") && toArray(verse.words).length === 0)) {
+        const withWords = await fetchVerse(true);
+        verse = asObject(asObject(withWords).verse ?? withWords);
+        arabicText = extractVerseArabicText(verse);
+      }
+
+      if (!arabicText) {
+        return null;
+      }
+
+      const chapterPayload = asObject(chapterResponse);
+      const chapter = asObject(chapterPayload.chapter ?? chapterPayload);
+      chapterName = asString(chapter.nameSimple, chapterName);
+
+      return {
+        arabicText,
+        chapterName,
+        id: asString(
+          verse.id ?? verse.verseKey ?? `${chapterId}-${asString(verse.verseNumber, "verse")}`,
+        ),
+        translationText: getTranslationText(verse.translations, config.translationIds),
+        verseKey: asNullableString(verse.verseKey) ?? verseKey,
+        verseNumber: asNullableNumber(verse.verseNumber),
+      };
+    } catch {
       return null;
     }
-
-    const fetchVerse = (includeWords: boolean) =>
-      byKey(verseKey, {
-        fields: { textUthmani: true },
-        translations: config.translationIds,
-        words: includeWords,
-        wordFields: includeWords ? { textUthmani: true } : undefined,
-      });
-
-    const [verseResponse, chapterResponse] = await Promise.all([
-      fetchVerse(false),
-      content.chapters.get(chapterId),
-    ]);
-
-    verse = asObject(asObject(verseResponse).verse ?? verseResponse);
-    let arabicText = extractVerseArabicText(verse);
-
-    if (!arabicText || (!arabicText.includes(" ") && toArray(verse.words).length === 0)) {
-      const withWords = await fetchVerse(true);
-      verse = asObject(asObject(withWords).verse ?? withWords);
-      arabicText = extractVerseArabicText(verse);
-    }
-
-    if (!arabicText) {
-      return null;
-    }
-
-    const chapterPayload = asObject(chapterResponse);
-    const chapter = asObject(chapterPayload.chapter ?? chapterPayload);
-    chapterName = asString(chapter.nameSimple, chapterName);
-
-    return {
-      arabicText,
-      chapterName,
-      id: asString(
-        verse.id ?? verse.verseKey ?? `${chapterId}-${asString(verse.verseNumber, "verse")}`,
-      ),
-      translationText: getTranslationText(verse.translations, config.translationIds),
-      verseKey: asNullableString(verse.verseKey) ?? verseKey,
-      verseNumber: asNullableNumber(verse.verseNumber),
-    };
   }
 
   const arabicText = extractVerseArabicText(verse);

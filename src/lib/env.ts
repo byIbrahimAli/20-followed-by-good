@@ -1,5 +1,17 @@
 import { DEFAULT_OAUTH2_BASE_URL } from "@/lib/oauth";
-import { requireAppBaseUrl } from "@/lib/resolve-app-base-url";
+import { ensureHttpsOrigin, requireAppBaseUrl } from "@/lib/resolve-app-base-url";
+
+const normalizeServiceUrl = (value: string | undefined): string | undefined => {
+  if (!value?.trim()) {
+    return undefined;
+  }
+
+  try {
+    return ensureHttpsOrigin(value);
+  } catch {
+    return undefined;
+  }
+};
 
 const REQUIRED_ENV_VARS = [
   "CLIENT_ID",
@@ -66,12 +78,16 @@ export const normalizeContentBaseUrl = (url?: string): string | undefined => {
 
 const buildServiceOverrides = () => {
   const services = {
-    authBaseUrl: getOptional("AUTH_BASE_URL"),
-    contentBaseUrl: normalizeContentBaseUrl(getOptional("CONTENT_BASE_URL")),
-    gatewayUrl: getOptional("GATEWAY_URL"),
-    oauth2BaseUrl: getOptional("OAUTH2_BASE_URL") ?? getOptional("TOKEN_HOST"),
-    quranReflectBaseUrl: getOptional("QURAN_REFLECT_BASE_URL"),
-    searchBaseUrl: getOptional("SEARCH_BASE_URL"),
+    authBaseUrl: normalizeServiceUrl(getOptional("AUTH_BASE_URL")),
+    contentBaseUrl: normalizeContentBaseUrl(
+      normalizeServiceUrl(getOptional("CONTENT_BASE_URL")),
+    ),
+    gatewayUrl: normalizeServiceUrl(getOptional("GATEWAY_URL")),
+    oauth2BaseUrl: normalizeServiceUrl(
+      getOptional("OAUTH2_BASE_URL") ?? getOptional("TOKEN_HOST"),
+    ),
+    quranReflectBaseUrl: normalizeServiceUrl(getOptional("QURAN_REFLECT_BASE_URL")),
+    searchBaseUrl: normalizeServiceUrl(getOptional("SEARCH_BASE_URL")),
   };
 
   const entries = Object.entries(services).filter(([, value]) =>

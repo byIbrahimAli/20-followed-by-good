@@ -92,58 +92,69 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const sessionContext = await getSession(request);
-  const body = (await request.json().catch(() => ({}))) as {
-    category?: string;
-    slipText?: string;
-  };
-
-  const category = String(body.category ?? "Reflection").trim() || "Reflection";
-  const slipText = String(body.slipText ?? "").trim();
-  const resolved = await resolveVerseFromSlip(
-    sessionContext.session,
-    slipText,
-    category,
-  );
-  const parsed = parseVerseKey(resolved.verseKey);
-
-  if (!parsed) {
-    const demo = buildFromDemo(category, getFallbackVerseKey(category));
-    demo.slipText = slipText;
-    assignmentCache.set(demo.id, demo);
-    return withSessionJson(sessionContext, toResponse(demo));
-  }
-
-  let assignment: CachedAssignment | null = null;
 
   try {
-    const verse = await loadVerseByKey(sessionContext.session, parsed);
+    const body = (await request.json().catch(() => ({}))) as {
+      category?: string;
+      slipText?: string;
+    };
 
-    if (verse?.arabicText && verse.translationText) {
-      assignment = {
-        id: randomUUID(),
-        verseKey: parsed,
-        category,
-        arabicText: verse.arabicText,
-        translationText: verse.translationText,
-        surahName: verse.chapterName,
-        ayahNumber: verse.verseNumber ?? Number(parsed.split(":")[1]),
-        tafsirSnippet: getMockTafsir(category),
-        reflectionPrompt: getReflectionPrompt(category),
-        slipText,
-        demo: false,
-        matchSource: resolved.matchSource,
-      };
+    const category = String(body.category ?? "Reflection").trim() || "Reflection";
+    const slipText = String(body.slipText ?? "").trim();
+    const resolved = await resolveVerseFromSlip(
+      sessionContext.session,
+      slipText,
+      category,
+    );
+    const parsed = parseVerseKey(resolved.verseKey);
+
+    if (!parsed) {
+      const demo = buildFromDemo(category, getFallbackVerseKey(category));
+      demo.slipText = slipText;
+      assignmentCache.set(demo.id, demo);
+      return withSessionJson(sessionContext, toResponse(demo));
     }
-  } catch {
-    /* fall through to demo */
-  }
 
-  if (!assignment) {
-    assignment = buildFromDemo(category, parsed);
-    assignment.slipText = slipText;
-    assignment.matchSource = resolved.matchSource;
-  }
+    let assignment: CachedAssignment | null = null;
 
-  assignmentCache.set(assignment.id, assignment);
-  return withSessionJson(sessionContext, toResponse(assignment));
+    try {
+      const verse = await loadVerseByKey(sessionContext.session, parsed);
+
+      if (verse?.arabicText && verse.translationText) {
+        assignment = {
+          id: randomUUID(),
+          verseKey: parsed,
+          category,
+          arabicText: verse.arabicText,
+          translationText: verse.translationText,
+          surahName: verse.chapterName,
+          ayahNumber: verse.verseNumber ?? Number(parsed.split(":")[1]),
+          tafsirSnippet: getMockTafsir(category),
+          reflectionPrompt: getReflectionPrompt(category),
+          slipText,
+          demo: false,
+          matchSource: resolved.matchSource,
+        };
+      }
+    } catch {
+      /* fall through to demo */
+    }
+
+    if (!assignment) {
+      assignment = buildFromDemo(category, parsed);
+      assignment.slipText = slipText;
+      assignment.matchSource = resolved.matchSource;
+    }
+
+    assignmentCache.set(assignment.id, assignment);
+    return withSessionJson(sessionContext, toResponse(assignment));
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Assignment could not be completed.";
+    return withSessionJson(
+      sessionContext,
+      { message, ok: false },
+      500,
+    );
+  }
 }

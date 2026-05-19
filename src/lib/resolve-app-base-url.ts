@@ -8,6 +8,20 @@ const getOptionalEnv = (key: string): string | undefined => {
   return value?.trim() ? value.trim() : undefined;
 };
 
+/** Add https:// when a host or API base is missing a scheme (avoids WebKit `new URL` failures). */
+export const ensureHttpsOrigin = (url: string): string => {
+  const trimmed = url.trim().replace(/\/$/, "");
+  if (!trimmed) {
+    throw new Error("URL must not be empty.");
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+};
+
 /** Strip trailing slash; add https:// when the host has no scheme (Vercel host vars). */
 export const normalizeAppBaseUrl = (url: string): string => {
   const trimmed = url.trim().replace(/\/$/, "");
