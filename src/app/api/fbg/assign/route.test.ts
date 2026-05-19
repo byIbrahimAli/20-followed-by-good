@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   loadSearchData: vi.fn(),
-  loadReaderData: vi.fn(),
+  loadVerseByKey: vi.fn(),
 }));
 
 vi.mock("@/lib/session", () => ({
@@ -14,7 +14,7 @@ vi.mock("@/lib/session", () => ({
 
 vi.mock("@/lib/data", () => ({
   loadSearchData: mocks.loadSearchData,
-  loadReaderData: mocks.loadReaderData,
+  loadVerseByKey: mocks.loadVerseByKey,
   parseVerseKey: (key: string) => (/^\d+:\d+$/.test(key) ? key : null),
 }));
 
@@ -29,14 +29,13 @@ vi.mock("@/lib/route-helpers", () => ({
 describe("POST /api/fbg/assign", () => {
   beforeEach(() => {
     mocks.getSession.mockResolvedValue({ session: {} });
-    mocks.loadSearchData.mockResolvedValue({ verseItems: [] });
-    mocks.loadReaderData.mockResolvedValue({
-      chapter: { nameSimple: "Az-Zumar" },
-      verses: [],
+    mocks.loadSearchData.mockResolvedValue({
+      verseItems: [{ verseKey: "41:34" }],
     });
+    mocks.loadVerseByKey.mockResolvedValue(null);
   });
 
-  it("returns demo fallback when reader has no arabic text", async () => {
+  it("returns demo fallback when verse load has no translation", async () => {
     const { POST } = await import("./route");
     const request = new NextRequest("http://localhost/api/fbg/assign", {
       method: "POST",
@@ -52,6 +51,30 @@ describe("POST /api/fbg/assign", () => {
     expect(body.assignment.translationText).toBeTruthy();
     expect(body.assignment.assignmentId).toBeTruthy();
     expect(body.assignment.demo).toBe(true);
+  });
+
+  it("returns live assignment when verse and translation load", async () => {
+    mocks.loadVerseByKey.mockResolvedValue({
+      arabicText: "وَٱلَّذِينَ صَبَرُوا۟",
+      chapterName: "Ash-Shura",
+      id: "4274",
+      translationText: "And those who are patient...",
+      verseKey: "42:43",
+      verseNumber: 43,
+    });
+
+    const { POST } = await import("./route");
+    const request = new NextRequest("http://localhost/api/fbg/assign", {
+      method: "POST",
+      body: JSON.stringify({ category: "Anger", slipText: "temper" }),
+    });
+
+    const response = await POST(request);
+    const body = await response.json();
+
+    expect(body.assignment.demo).toBe(false);
+    expect(body.assignment.translationText).toBe("And those who are patient...");
+    expect(body.assignment.surahName).toBe("Ash-Shura");
   });
 });
 

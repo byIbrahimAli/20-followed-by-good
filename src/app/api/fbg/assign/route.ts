@@ -9,10 +9,9 @@ import {
   getMockTafsir,
   getReflectionPrompt,
 } from "@/lib/fbg/category-queries";
-import { loadReaderData, loadSearchData, parseVerseKey } from "@/lib/data";
+import { loadSearchData, loadVerseByKey, parseVerseKey } from "@/lib/data";
 import { withSessionJson } from "@/lib/route-helpers";
 import { getSession } from "@/lib/session";
-import type { ReaderVerse } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -31,23 +30,6 @@ export interface CachedAssignment {
 }
 
 const assignmentCache = new Map<string, CachedAssignment>();
-
-const pickVerseFromReader = (
-  payload: Awaited<ReturnType<typeof loadReaderData>>,
-  verseKey: string,
-): ReaderVerse | null => {
-  const exact = payload.verses.find((verse) => verse.verseKey === verseKey);
-  if (exact) {
-    return exact;
-  }
-
-  const ayahNumber = Number(verseKey.split(":")[1]);
-  return (
-    payload.verses.find((verse) => verse.verseNumber === ayahNumber) ??
-    payload.verses[0] ??
-    null
-  );
-};
 
 const resolveVerseKey = async (
   session: Awaited<ReturnType<typeof getSession>>["session"],
@@ -142,22 +124,19 @@ export async function POST(request: NextRequest) {
     return withSessionJson(sessionContext, toResponse(demo));
   }
 
-  const chapterId = parsed.split(":")[0];
   let assignment: CachedAssignment | null = null;
 
   try {
-    const reader = await loadReaderData(sessionContext.session, chapterId);
-    const verse = pickVerseFromReader(reader, parsed);
+    const verse = await loadVerseByKey(sessionContext.session, parsed);
 
-    if (verse?.arabicText) {
+    if (verse?.arabicText && verse.translationText) {
       assignment = {
         id: randomUUID(),
         verseKey: parsed,
         category,
         arabicText: verse.arabicText,
-        translationText:
-          verse.translationText ?? "Translation unavailable in this environment.",
-        surahName: reader.chapter.nameSimple,
+        translationText: verse.translationText,
+        surahName: verse.chapterName,
         ayahNumber: verse.verseNumber ?? Number(parsed.split(":")[1]),
         tafsirSnippet: getMockTafsir(category),
         reflectionPrompt: getReflectionPrompt(category),

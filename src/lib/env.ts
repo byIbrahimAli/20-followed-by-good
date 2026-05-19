@@ -34,9 +34,12 @@ const toPositiveInt = (value: string | undefined, fallback: number): number => {
   return parsed;
 };
 
+/** Saheeh International — available on production Content API (131 is not). */
+export const DEFAULT_TRANSLATION_ID = 20;
+
 export const parseTranslationIds = (value: string | undefined): number[] => {
   if (!value) {
-    return [131];
+    return [DEFAULT_TRANSLATION_ID];
   }
 
   const parsed = value
@@ -46,7 +49,7 @@ export const parseTranslationIds = (value: string | undefined): number[] => {
     .map((item) => Number.parseInt(item, 10))
     .filter((item) => Number.isInteger(item) && item > 0);
 
-  return parsed.length > 0 ? parsed : [131];
+  return parsed.length > 0 ? parsed : [DEFAULT_TRANSLATION_ID];
 };
 
 /** @quranjs/api expects the content service host to include a `/content` suffix. */

@@ -66,6 +66,7 @@ interface ServerContentClient {
     };
     verses: {
       byChapter: (chapterId: string, params: UnknownRecord) => Promise<unknown>;
+      byKey?: (verseKey: string, params: UnknownRecord) => Promise<unknown>;
     };
   };
 }

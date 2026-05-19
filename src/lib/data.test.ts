@@ -4,6 +4,7 @@ import {
   buildReaderUrlFromKey,
   ensureUserScope,
   getGrantedScopes,
+  getTranslationText,
   loadReaderData,
   parsePositiveInteger,
   parseVerseKey,
@@ -26,6 +27,23 @@ vi.mock("@/lib/sdk", () => ({
   }),
   getSearchModeQuick: () => "quick",
 }));
+
+describe("getTranslationText", () => {
+  it("prefers matching resource id and strips markup", () => {
+    expect(
+      getTranslationText(
+        [{ resourceId: 20, text: "In the name of Allāh,<sup foot_note=1>1</sup>" }],
+        20,
+      ),
+    ).toBe("In the name of Allāh,1");
+  });
+
+  it("reads snake_case resource_id from API payloads", () => {
+    expect(
+      getTranslationText([{ resource_id: 20, text: "Bismillah" }], [20, 203]),
+    ).toBe("Bismillah");
+  });
+});
 
 describe("buildReaderUrlFromKey", () => {
   it("builds chapter url from chapter key", () => {

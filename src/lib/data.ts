@@ -102,27 +102,40 @@ const formatTimestamp = (value: unknown): string | null => {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 };
 
-const getTranslationText = (
+const stripTranslationMarkup = (text: string): string =>
+  text
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const translationResourceId = (translation: JsonObject): number | null =>
+  asNullableNumber(translation.resourceId ?? translation.resource_id);
+
+export const getTranslationText = (
   translations: unknown,
-  preferredResourceId: number,
+  preferredResourceIds: number | number[],
 ): string | null => {
   const items = Array.isArray(translations) ? translations : [];
   if (items.length === 0) {
     return null;
   }
 
-  const preferred = items.find((item) => {
-    const translation = asObject(item);
-    const resourceId = asNullableNumber(translation.resourceId);
-    const text = asNullableString(translation.text);
-    return resourceId === preferredResourceId && Boolean(text);
-  });
+  const preferredIds = Array.isArray(preferredResourceIds)
+    ? preferredResourceIds
+    : [preferredResourceIds];
 
-  if (preferred) {
-    const translation = asObject(preferred);
-    const text = asNullableString(translation.text);
-    if (text) {
-      return text;
+  for (const resourceId of preferredIds) {
+    const match = items.find((item) => {
+      const translation = asObject(item);
+      const text = asNullableString(translation.text);
+      return translationResourceId(translation) === resourceId && Boolean(text);
+    });
+
+    if (match) {
+      const text = asNullableString(asObject(match).text);
+      if (text) {
+        return stripTranslationMarkup(text);
+      }
     }
   }
 
@@ -134,7 +147,8 @@ const getTranslationText = (
     return null;
   }
 
-  return asNullableString(asObject(firstWithText).text);
+  const text = asNullableString(asObject(firstWithText).text);
+  return text ? stripTranslationMarkup(text) : null;
 };
 
 export const buildReaderUrlFromKey = (key: string | null | undefined): string | null => {
@@ -463,6 +477,53 @@ export const loadSearchData = async (
   }
 };
 
+export const loadVerseByKey = async (
+  session: StoredSession,
+  verseKey: string,
+): Promise<(ReaderVerse & { chapterName: string }) | null> => {
+  const config = getConfig();
+  const { serverClient } = await createClients(session);
+  const chapterId = verseKey.split(":")[0];
+  if (!chapterId) {
+    return null;
+  }
+
+  const content = serverClient.content?.v4;
+  const byKey = content?.verses?.byKey;
+  if (typeof byKey !== "function") {
+    return null;
+  }
+
+  const [verseResponse, chapterResponse] = await Promise.all([
+    byKey(verseKey, {
+      fields: { textUthmani: true },
+      translations: config.translationIds,
+      words: false,
+    }),
+    content.chapters.get(chapterId),
+  ]);
+
+  const verse = asObject(asObject(verseResponse).verse ?? verseResponse);
+  const chapterPayload = asObject(chapterResponse);
+  const chapter = asObject(chapterPayload.chapter ?? chapterPayload);
+  const arabicText = asString(verse.textUthmani);
+
+  if (!arabicText) {
+    return null;
+  }
+
+  return {
+    arabicText,
+    chapterName: asString(chapter.nameSimple, `Chapter ${chapterId}`),
+    id: asString(
+      verse.id ?? verse.verseKey ?? `${chapterId}-${asString(verse.verseNumber, "verse")}`,
+    ),
+    translationText: getTranslationText(verse.translations, config.translationIds),
+    verseKey: asNullableString(verse.verseKey) ?? verseKey,
+    verseNumber: asNullableNumber(verse.verseNumber),
+  };
+};
+
 export const loadReaderData = async (
   session: StoredSession,
   chapterId: string,
@@ -499,7 +560,7 @@ export const loadReaderData = async (
       id: asString(
         verse.id ?? verse.verseKey ?? `${chapterId}-${asString(verse.verseNumber, "verse")}`,
       ),
-      translationText: getTranslationText(verse.translations, config.translationIds[0]),
+      translationText: getTranslationText(verse.translations, config.translationIds),
       verseKey: asNullableString(verse.verseKey),
       verseNumber: asNullableNumber(verse.verseNumber),
     }));
