@@ -4,8 +4,8 @@ import { NextRequest } from "next/server";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
-  loadSearchData: vi.fn(),
   loadVerseByKey: vi.fn(),
+  resolveVerseFromSlip: vi.fn(),
 }));
 
 vi.mock("@/lib/session", () => ({
@@ -13,9 +13,12 @@ vi.mock("@/lib/session", () => ({
 }));
 
 vi.mock("@/lib/data", () => ({
-  loadSearchData: mocks.loadSearchData,
   loadVerseByKey: mocks.loadVerseByKey,
   parseVerseKey: (key: string) => (/^\d+:\d+$/.test(key) ? key : null),
+}));
+
+vi.mock("@/lib/fbg/resolve-verse-from-slip", () => ({
+  resolveVerseFromSlip: mocks.resolveVerseFromSlip,
 }));
 
 vi.mock("@/lib/route-helpers", () => ({
@@ -29,8 +32,9 @@ vi.mock("@/lib/route-helpers", () => ({
 describe("POST /api/fbg/assign", () => {
   beforeEach(() => {
     mocks.getSession.mockResolvedValue({ session: {} });
-    mocks.loadSearchData.mockResolvedValue({
-      verseItems: [{ verseKey: "41:34" }],
+    mocks.resolveVerseFromSlip.mockResolvedValue({
+      matchSource: "fallback",
+      verseKey: "49:12",
     });
     mocks.loadVerseByKey.mockResolvedValue(null);
   });
@@ -54,6 +58,10 @@ describe("POST /api/fbg/assign", () => {
   });
 
   it("returns live assignment when verse and translation load", async () => {
+    mocks.resolveVerseFromSlip.mockResolvedValue({
+      matchSource: "search-slip",
+      verseKey: "42:43",
+    });
     mocks.loadVerseByKey.mockResolvedValue({
       arabicText: "وَٱلَّذِينَ صَبَرُوا۟",
       chapterName: "Ash-Shura",

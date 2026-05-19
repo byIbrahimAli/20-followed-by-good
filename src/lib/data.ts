@@ -4,7 +4,7 @@ import { DEFAULT_BOOKMARK_MUSHAF, DEFAULT_FEED_QUERY, LIST_PREVIEW_LIMIT, SESSIO
 import { getConfig } from "@/lib/env";
 import { decodeJwt } from "@/lib/oauth";
 import type { StoredSession } from "@/lib/session/store";
-import { createClients, getSearchModeQuick } from "@/lib/sdk";
+import { createClients, getSearchModeAdvanced, getSearchModeQuick } from "@/lib/sdk";
 import type {
   BookmarkItem,
   BootstrapPayload,
@@ -348,13 +348,22 @@ const normalizeSearchResults = (response: unknown, query: string) => {
     subtitle: asNullableString(item.arabic ?? item.result_type),
   }));
 
-  const verseItems: SearchItem[] = toArray(result.verses).map((item) => ({
-    readerUrl: buildReaderUrlFromKey(asNullableString(item.key ?? item.verseKey)),
-    text:
-      asNullableString(item.text ?? item.textUthmani) ??
-      `Open ${asString(item.key ?? item.verseKey, "this result")} in the reader`,
-    verseKey: asNullableString(item.key ?? item.verseKey),
-  }));
+  const verseItems: SearchItem[] = toArray(result.verses).map((item) => {
+    const verseKey = asNullableString(item.key ?? item.verseKey ?? item.verse_key);
+    const snippet =
+      asNullableString(item.text) ??
+      asNullableString(item.textUthmani) ??
+      asNullableString(item.highlighted) ??
+      asNullableString(item.translation);
+
+    return {
+      readerUrl: buildReaderUrlFromKey(verseKey),
+      text:
+        snippet ??
+        `Open ${asString(verseKey ?? item.key, "this result")} in the reader`,
+      verseKey,
+    };
+  });
 
   return {
     error: null,
@@ -442,9 +451,17 @@ export const loadContentPreviewData = async (
   return payload;
 };
 
+export interface LoadSearchOptions {
+  /** Include verse text snippets in search hits (for reranking). */
+  getText?: boolean;
+  useAdvanced?: boolean;
+  versesResultsNumber?: number;
+}
+
 export const loadSearchData = async (
   session: StoredSession,
   query: string | null,
+  options: LoadSearchOptions = {},
 ): Promise<{ error: string | null; navigationItems: SearchItem[]; query: string; verseItems: SearchItem[] }> => {
   const normalizedQuery = String(query ?? "").trim();
 
@@ -458,12 +475,19 @@ export const loadSearchData = async (
   }
 
   const { serverClient } = await createClients(session);
-  const mode = await getSearchModeQuick();
+  const mode = options.useAdvanced
+    ? await getSearchModeAdvanced()
+    : await getSearchModeQuick();
+
+  const versesResultsNumber = options.versesResultsNumber ?? 5;
 
   try {
     const response = await serverClient.search.v1.query({
+      getText: options.getText ? "1" : undefined,
       mode,
       query: normalizedQuery,
+      size: versesResultsNumber,
+      versesResultsNumber,
     });
 
     return normalizeSearchResults(response, normalizedQuery);

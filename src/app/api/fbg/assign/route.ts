@@ -3,13 +3,13 @@ import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 
 import {
-  getCategoryQuery,
   getDemoVerseForCategory,
   getFallbackVerseKey,
   getMockTafsir,
   getReflectionPrompt,
 } from "@/lib/fbg/category-queries";
-import { loadSearchData, loadVerseByKey, parseVerseKey } from "@/lib/data";
+import { resolveVerseFromSlip } from "@/lib/fbg/resolve-verse-from-slip";
+import { loadVerseByKey, parseVerseKey } from "@/lib/data";
 import { withSessionJson } from "@/lib/route-helpers";
 import { getSession } from "@/lib/session";
 
@@ -27,26 +27,10 @@ export interface CachedAssignment {
   reflectionPrompt: string;
   slipText?: string;
   demo?: boolean;
+  matchSource?: string;
 }
 
 const assignmentCache = new Map<string, CachedAssignment>();
-
-const resolveVerseKey = async (
-  session: Awaited<ReturnType<typeof getSession>>["session"],
-  category: string,
-): Promise<string> => {
-  const query = getCategoryQuery(category);
-  const search = await loadSearchData(session, query);
-  const fromSearch =
-    search.verseItems.find((item) => parseVerseKey(item.verseKey))?.verseKey ??
-    null;
-
-  if (fromSearch && parseVerseKey(fromSearch)) {
-    return fromSearch;
-  }
-
-  return getFallbackVerseKey(category);
-};
 
 const buildFromDemo = (category: string, verseKey: string): CachedAssignment => {
   const demo = getDemoVerseForCategory(category);
@@ -76,6 +60,7 @@ const toResponse = (item: CachedAssignment) => ({
     translationText: item.translationText,
     verseKey: item.verseKey,
     demo: item.demo ?? false,
+    matchSource: item.matchSource,
   },
   ok: true,
   slipText: item.slipText,
@@ -114,8 +99,12 @@ export async function POST(request: NextRequest) {
 
   const category = String(body.category ?? "Reflection").trim() || "Reflection";
   const slipText = String(body.slipText ?? "").trim();
-  const verseKey = await resolveVerseKey(sessionContext.session, category);
-  const parsed = parseVerseKey(verseKey);
+  const resolved = await resolveVerseFromSlip(
+    sessionContext.session,
+    slipText,
+    category,
+  );
+  const parsed = parseVerseKey(resolved.verseKey);
 
   if (!parsed) {
     const demo = buildFromDemo(category, getFallbackVerseKey(category));
@@ -142,6 +131,7 @@ export async function POST(request: NextRequest) {
         reflectionPrompt: getReflectionPrompt(category),
         slipText,
         demo: false,
+        matchSource: resolved.matchSource,
       };
     }
   } catch {
@@ -151,6 +141,7 @@ export async function POST(request: NextRequest) {
   if (!assignment) {
     assignment = buildFromDemo(category, parsed);
     assignment.slipText = slipText;
+    assignment.matchSource = resolved.matchSource;
   }
 
   assignmentCache.set(assignment.id, assignment);

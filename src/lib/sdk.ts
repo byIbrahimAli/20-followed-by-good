@@ -232,17 +232,25 @@ export const createClients = async (session: StoredSession) => {
   };
 };
 
-export const getSearchModeQuick = async (): Promise<string> => {
+const getSearchModeValue = async (
+  key: "Quick" | "Advanced",
+  fallback: string,
+): Promise<string> => {
   try {
     const runtimeModule = await dynamicImport("@quranjs/api");
     const searchMode = runtimeModule.SearchMode as
-      | { Quick?: unknown }
+      | { Quick?: unknown; Advanced?: unknown }
       | undefined;
 
-    return typeof searchMode?.Quick === "string"
-      ? searchMode.Quick
-      : "quick";
+    const value = searchMode?.[key];
+    return typeof value === "string" ? value : fallback;
   } catch (_error) {
-    return "quick";
+    return fallback;
   }
 };
+
+export const getSearchModeQuick = async (): Promise<string> =>
+  getSearchModeValue("Quick", "quick");
+
+export const getSearchModeAdvanced = async (): Promise<string> =>
+  getSearchModeValue("Advanced", "advanced");

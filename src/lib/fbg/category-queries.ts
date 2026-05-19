@@ -9,6 +9,7 @@ export const CATEGORY_QUERIES: Record<string, string> = {
   Gratitude: "be grateful",
   Family: "parents kindness",
   "Self-Discipline": "eat and drink",
+  Kindness: "do not wrong creation kindness animals",
   Reflection: "repentance mercy",
 };
 
@@ -23,6 +24,7 @@ export const CATEGORY_FALLBACK_VERSE: Record<string, string> = {
   Gratitude: "14:7",
   Family: "17:23",
   "Self-Discipline": "7:31",
+  Kindness: "6:38",
   Reflection: "39:53",
 };
 
@@ -37,6 +39,8 @@ export const MOCK_TAFSIR: Record<string, string> = {
   Gratitude: "Increase in thanks opens increase in provision and peace.",
   Family: "Kindness to parents is among the deeds most beloved after tawhid.",
   "Self-Discipline": "Moderation in consumption trains the nafs for higher obedience.",
+  Kindness:
+    "Creation is a trust; harming animals without need hardens the heart away from mercy.",
   Reflection: "No sin outruns His mercy when repentance is sincere.",
 };
 
@@ -51,6 +55,8 @@ export const REFLECTION_PROMPTS: Record<string, string> = {
   Gratitude: "Name three gifts from today you overlooked.",
   Family: "What small act of kindness can you offer a parent or elder today?",
   "Self-Discipline": "Where did appetite win, and what limit will you hold gently tomorrow?",
+  Kindness:
+    "What harm was done, and how can you show care for Allah's creation tomorrow?",
   Reflection: "What is one sincere dua you can make before sleep tonight?",
 };
 

@@ -1,3 +1,5 @@
+import { SLIP_THEME_RULES } from "@/lib/fbg/verse-match-catalog";
+
 const KEYWORD_RULES: Array<{ pattern: RegExp; category: string }> = [
   { pattern: /\b(fajr|dhuhr|asr|maghrib|isha|salah|salaah|prayer|prayed|missed prayer)\b/i, category: "Prayer Consistency" },
   { pattern: /\b(anger|angry|temper|rage|shout|yell|furious)\b/i, category: "Anger" },
@@ -25,6 +27,12 @@ export const extractCategory = (text: string): string => {
   const normalized = text.trim();
   if (!normalized) {
     return DEFAULT_CATEGORY;
+  }
+
+  for (const rule of SLIP_THEME_RULES) {
+    if (rule.pattern.test(normalized)) {
+      return rule.category;
+    }
   }
 
   for (const rule of KEYWORD_RULES) {

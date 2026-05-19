@@ -25,4 +25,12 @@ describe("slip-taxonomy", () => {
   it("maps gossip keywords to Speech category", () => {
     expect(extractCategory("I gossip about my friend")).toBe("Speech");
   });
+
+  it("maps explicit content slips to Lower Gaze", () => {
+    expect(extractCategory("porn")).toBe("Lower Gaze");
+  });
+
+  it("maps animal harm slips to Kindness", () => {
+    expect(extractCategory("I shaved a cat")).toBe("Kindness");
+  });
 });
