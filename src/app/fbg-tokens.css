@@ -22,8 +22,6 @@
   --fbg-radius-card: 24px;
   --fbg-section-gap: 1.5rem;
   --fbg-margin-mobile: 1rem;
-  --fbg-shell-pad: 4rem;
-  --fbg-nav-height: 3.5rem;
 }
 
 /* Warm light — cream paper & gold */
@@ -108,4 +106,19 @@
   --fbg-error-container: rgba(127, 29, 29, 0.45);
   --fbg-error-fg: #fca5a5;
   --fbg-warn: #d4a574;
+}
+
+/* Layout chrome — shared across all themes */
+:root,
+[data-fbg-theme="default"],
+[data-fbg-theme="warm-light"],
+[data-fbg-theme="warm-dark"],
+[data-fbg-theme="serenity-light"],
+[data-fbg-theme="serenity-dark"] {
+  --fbg-ticker-height: 1.5rem;
+  --fbg-nav-height: 3.5rem;
+  --fbg-shell-pad: 4rem;
+  --fbg-chrome-height: calc(
+    var(--fbg-nav-height) + var(--fbg-ticker-height) + env(safe-area-inset-bottom, 0px)
+  );
 }
