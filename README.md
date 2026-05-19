@@ -39,10 +39,10 @@ Bad deeds happen. **Followed By Good** helps you respond with restorative accoun
 ### Demo checklist (mobile UI + recovery loop)
 
 1. **Desktop** — open `/` on a wide screen; app appears as a centered **390×844** phone frame on `#0A0A0A` night background.
-2. **Home** — “What slipped today?” card, chips, **In review** horizontal scroller, community bento (mock).
+2. **Home** — “What slipped today?” slip card only (+ sign-in banner when logged out).
 3. Log a slip → **Continue** → assign page shows Arabic + translation (Search + Reader APIs, or demo fallback on prelive).
-4. **Begin memorizing** → SRS session → grade **Easy** → home **In review** updates.
-5. Bottom nav: home, study (`/recover` redirects to home `#moment`), community mock at `/community`.
+4. **Begin memorizing** → SRS session → grade **Easy** → open **Memorize** tab for in-review list + metrics.
+5. Bottom tabs: **Home** (`/`), **Memorize** (`/memorize` hub), **Community** (`/community` mock).
 6. Optional: `/?demo=1` seeds a due Anger review card.
 
 **APIs hit:** `POST /api/fbg/assign` (Search → Reader → demo fallback), `GET /api/fbg/assign?id=`, `GET /api/bootstrap` (goals when signed in), optional `POST /api/collections`.
@@ -53,11 +53,11 @@ npm run lint && npm run build && npm test && npm run test:e2e
 
 ### Manual test flow
 
-1. Open `/` — dashboard with slip card and review queue.
-2. Bottom command bar or home textarea — log a slip, **Continue**.
+1. Open `/` — slip card only.
+2. Log a slip from the textarea, **Continue**.
 3. Assign page — **Begin memorizing** or **Save for later**.
 4. `/memorize/[sessionId]` — blur, type recall, grade easy/hard.
-5. Return to `/` — item appears in **In review**.
+5. **Memorize** tab — full in-review list with metrics header.
 
 ## 🔌 APIs we're using
 

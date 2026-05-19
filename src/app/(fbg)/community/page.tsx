@@ -24,7 +24,7 @@ export default function CommunityPage() {
 
       <section className={ui.bentoGrid}>
         <article className={`${ui.bentoCard} ${ui.bentoWide}`}>
-          <p className={ui.bentoLabel}>Your sahib</p>
+          <p className={ui.bentoLabel}>Your companion</p>
           <p style={{ fontSize: "0.95rem" }}>
             Yusuf is on a 12-day streak. Send a nudge after your next review.
           </p>

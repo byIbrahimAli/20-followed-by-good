@@ -145,86 +145,87 @@
   left: 0;
   right: 0;
   z-index: 30;
-  padding: 0.65rem var(--fbg-margin-mobile) calc(0.65rem + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent, var(--fbg-bg-base) 24%);
+  padding: 0.5rem var(--fbg-margin-mobile) calc(0.5rem + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, var(--fbg-bg-base) 20%);
 }
 
-.bottomNavInner {
+.tabBar {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: stretch;
+  gap: 0.35rem;
   background: var(--fbg-bg-charcoal);
   border: 1px solid var(--fbg-outline-variant);
   border-radius: 999px;
-  padding: 0.35rem 0.35rem 0.35rem 1rem;
+  padding: 0.35rem;
 }
 
-.bottomInput {
+.tabItem,
+.tabItemActive {
   flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--fbg-fg-base);
-  outline: none;
-  min-width: 0;
-  font-size: 0.85rem;
-}
-
-.bottomInput::placeholder {
-  color: var(--fbg-fg-muted);
-}
-
-.navIcons {
   display: flex;
-  gap: 0.35rem;
+  flex-direction: column;
   align-items: center;
-}
-
-.navIcon {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: var(--fbg-fg-muted);
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0.25rem;
+  border-radius: 999px;
   text-decoration: none;
+  color: var(--fbg-fg-muted);
+  font-size: 0.65rem;
+  min-width: 0;
 }
 
-.navIconActive {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
+.tabItemActive {
   background: var(--fbg-primary-dim);
   color: var(--fbg-primary);
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
 }
 
-.micBtn,
-.submitBtn {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  border: none;
+.tabLabel {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: var(--fbg-section-gap);
+}
+
+.reviewList .reviewCard {
+  flex: none;
+  max-width: none;
+  width: 100%;
+}
+
+.metricsRow {
   display: grid;
-  place-items: center;
-  cursor: pointer;
-  flex-shrink: 0;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.micBtn {
-  background: var(--fbg-bg-soft);
+.metricCard {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+}
+
+.metricValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--fbg-fg-base);
+  margin: 0;
+}
+
+.metricLabel {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--fbg-fg-muted);
-}
-
-.submitBtn {
-  background: var(--fbg-primary);
-  color: var(--fbg-bg-night);
+  margin: 0.25rem 0 0;
 }
 
 .materialIcon {

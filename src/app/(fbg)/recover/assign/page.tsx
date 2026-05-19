@@ -214,23 +214,6 @@ function AssignContent() {
         {saving ? "Saving…" : "Save for later"}
       </button>
 
-      <nav
-        aria-label="Assign actions"
-        className={ui.bottomNav}
-        style={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
-      >
-        <div className={ui.bottomNavInner}>
-          <input
-            className={ui.bottomInput}
-            disabled
-            placeholder="Ask about this ayah (AI soon)…"
-            type="text"
-          />
-          <button aria-label="Voice" className={ui.micBtn} type="button">
-            <span className={ui.materialIcon}>mic</span>
-          </button>
-        </div>
-      </nav>
     </>
   );
 }

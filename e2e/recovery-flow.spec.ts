@@ -47,13 +47,13 @@ test.describe("recovery flow", () => {
     });
   });
 
-  test("slip → assign → memorize → home review", async ({ page }) => {
+  test("slip → assign → memorize → memorize hub", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
 
     await page.getByPlaceholder(/Name it gently/i).fill("I lost my temper at work");
     await page.getByRole("button", { name: "Continue" }).click();
 
-    await expect(page.getByText(/Good and evil|Fussilat/i)).toBeVisible({
+    await expect(page.getByText("Good and evil are not equal.")).toBeVisible({
       timeout: 15_000,
     });
 
@@ -66,7 +66,12 @@ test.describe("recovery flow", () => {
       timeout: 10_000,
     });
 
-    const review = page.getByText(/In review/i);
-    await expect(review).toBeVisible();
+    await expect(page.getByText(/^In review$/)).not.toBeVisible();
+
+    await page.getByRole("link", { name: "Memorize" }).click();
+
+    await expect(page.getByRole("heading", { name: "Memorize" })).toBeVisible();
+    await expect(page.getByText("Avg progress")).toBeVisible();
+    await expect(page.getByText(/% retention/).first()).toBeVisible();
   });
 });
