@@ -1,4 +1,4 @@
-import { computeRetentionPercent } from "@/lib/fbg/srs";
+import { isSessionMastered } from "@/lib/fbg/srs";
 import {
   isDueTodayOrEarlier,
   type Assignment,
@@ -8,7 +8,7 @@ import {
 export interface ReviewItem {
   href: string;
   id: string;
-  percent: number;
+  memorized: boolean;
   subtitle: string;
   title: string;
   arabicSnippet?: string;
@@ -17,8 +17,9 @@ export interface ReviewItem {
 
 export interface ReviewMetrics {
   totalInReview: number;
-  avgProgress: number;
-  closest: ReviewItem | null;
+  memorizedCount: number;
+  learningCount: number;
+  nextUp: ReviewItem | null;
 }
 
 export const buildReviewItems = (
@@ -36,7 +37,7 @@ export const buildReviewItems = (
     ...dueSessions.map((session) => ({
       href: `/memorize/${session.id}`,
       id: session.id,
-      percent: computeRetentionPercent(session.intervalIndex),
+      memorized: isSessionMastered(session.intervalIndex),
       subtitle: `${session.surahName} · ${session.verseKey}`,
       title: "SRS review due",
       arabicSnippet: session.arabicText,
@@ -45,7 +46,7 @@ export const buildReviewItems = (
     ...pendingAssignments.map((item) => ({
       href: `/recover/assign?id=${item.id}`,
       id: item.id,
-      percent: item.status === "memorizing" ? 40 : 10,
+      memorized: item.status === "done",
       subtitle: item.verseKey,
       title: item.category,
       arabicSnippet: item.arabicText,
@@ -59,30 +60,25 @@ const isDueToday = (isoDate?: string): boolean =>
 
 export const computeReviewMetrics = (items: ReviewItem[]): ReviewMetrics => {
   if (items.length === 0) {
-    return { totalInReview: 0, avgProgress: 0, closest: null };
+    return {
+      totalInReview: 0,
+      memorizedCount: 0,
+      learningCount: 0,
+      nextUp: null,
+    };
   }
 
-  const avgProgress = Math.round(
-    items.reduce((sum, item) => sum + item.percent, 0) / items.length,
-  );
+  const memorizedCount = items.filter((item) => item.memorized).length;
+  const learningCount = items.length - memorizedCount;
 
-  let closest = items[0];
-  for (const item of items.slice(1)) {
-    if (item.percent > closest.percent) {
-      closest = item;
-      continue;
-    }
-    if (item.percent !== closest.percent) {
-      continue;
-    }
-    if (isDueToday(item.nextDue) && !isDueToday(closest.nextDue)) {
-      closest = item;
-    }
-  }
+  const learningItems = items.filter((item) => !item.memorized);
+  const nextUp =
+    learningItems.find((item) => isDueToday(item.nextDue)) ?? learningItems[0] ?? null;
 
   return {
     totalInReview: items.length,
-    avgProgress,
-    closest,
+    memorizedCount,
+    learningCount,
+    nextUp,
   };
 };

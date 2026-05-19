@@ -35,29 +35,24 @@ export default function MemorizeHubPage() {
           <p className={ui.metricLabel}>In review</p>
         </article>
         <article className={ui.metricCard}>
-          <p className={ui.metricValue}>{metrics.avgProgress}%</p>
-          <p className={ui.metricLabel}>Avg progress</p>
+          <p className={`${ui.metricValue} ${ui.metricValueMemorized}`}>
+            {metrics.memorizedCount}
+          </p>
+          <p className={ui.metricLabel}>Memorized</p>
         </article>
         <article className={ui.metricCard}>
-          {metrics.closest ? (
-            <>
-              <p className={ui.metricValue}>{metrics.closest.percent}%</p>
-              <p className={ui.metricLabel}>Closest</p>
-            </>
-          ) : (
-            <>
-              <p className={ui.metricValue}>—</p>
-              <p className={ui.metricLabel}>Closest</p>
-            </>
-          )}
+          <p className={`${ui.metricValue} ${ui.metricValueLearning}`}>
+            {metrics.learningCount}
+          </p>
+          <p className={ui.metricLabel}>Learning</p>
         </article>
       </section>
 
-      {metrics.closest ? (
+      {metrics.nextUp ? (
         <p className={styles.meta}>
           Next up:{" "}
-          <Link href={metrics.closest.href}>
-            {metrics.closest.title} · {metrics.closest.subtitle}
+          <Link href={metrics.nextUp.href}>
+            {metrics.nextUp.title} · {metrics.nextUp.subtitle}
           </Link>
         </p>
       ) : null}
@@ -75,7 +70,7 @@ export default function MemorizeHubPage() {
               arabicSnippet={item.arabicSnippet}
               href={item.href}
               key={item.id}
-              percent={item.percent}
+              memorized={item.memorized}
               subtitle={item.subtitle}
               title={item.title}
             />

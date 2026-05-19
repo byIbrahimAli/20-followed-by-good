@@ -5,6 +5,7 @@ import {
   computeReviewMetrics,
   type ReviewItem,
 } from "@/lib/fbg/review-items";
+import { maxSrsIntervalIndex } from "@/lib/fbg/srs";
 import type { Assignment, SrsSession } from "@/lib/fbg/store";
 
 const today = new Date().toISOString().slice(0, 10);
@@ -40,7 +41,18 @@ describe("buildReviewItems", () => {
     const items = buildReviewItems([baseAssignment], [baseSession]);
     expect(items).toHaveLength(2);
     expect(items[0].href).toBe("/memorize/s1");
+    expect(items[0].memorized).toBe(false);
     expect(items[1].href).toBe("/recover/assign?id=a1");
+    expect(items[1].memorized).toBe(false);
+  });
+
+  it("marks mastered sessions", () => {
+    const mastered: SrsSession = {
+      ...baseSession,
+      intervalIndex: maxSrsIntervalIndex(),
+    };
+    const items = buildReviewItems([], [mastered]);
+    expect(items[0].memorized).toBe(true);
   });
 });
 
@@ -48,17 +60,18 @@ describe("computeReviewMetrics", () => {
   it("returns zeros when empty", () => {
     expect(computeReviewMetrics([])).toEqual({
       totalInReview: 0,
-      avgProgress: 0,
-      closest: null,
+      memorizedCount: 0,
+      learningCount: 0,
+      nextUp: null,
     });
   });
 
-  it("averages progress and picks highest percent", () => {
+  it("counts memorized vs learning and picks next learning item due today", () => {
     const items: ReviewItem[] = [
       {
         href: "/a",
         id: "1",
-        percent: 10,
+        memorized: true,
         subtitle: "a",
         title: "A",
         nextDue: "2099-01-01",
@@ -66,7 +79,7 @@ describe("computeReviewMetrics", () => {
       {
         href: "/b",
         id: "2",
-        percent: 50,
+        memorized: false,
         subtitle: "b",
         title: "B",
         nextDue: today,
@@ -74,29 +87,8 @@ describe("computeReviewMetrics", () => {
     ];
     const metrics = computeReviewMetrics(items);
     expect(metrics.totalInReview).toBe(2);
-    expect(metrics.avgProgress).toBe(30);
-    expect(metrics.closest?.id).toBe("2");
-  });
-
-  it("breaks ties by preferring item due today", () => {
-    const items: ReviewItem[] = [
-      {
-        href: "/a",
-        id: "1",
-        percent: 50,
-        subtitle: "a",
-        title: "A",
-        nextDue: "2099-01-01",
-      },
-      {
-        href: "/b",
-        id: "2",
-        percent: 50,
-        subtitle: "b",
-        title: "B",
-        nextDue: today,
-      },
-    ];
-    expect(computeReviewMetrics(items).closest?.id).toBe("2");
+    expect(metrics.memorizedCount).toBe(1);
+    expect(metrics.learningCount).toBe(1);
+    expect(metrics.nextUp?.id).toBe("2");
   });
 });

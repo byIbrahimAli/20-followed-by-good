@@ -51,6 +51,9 @@ export const computeRetentionPercent = (
 
 export const maxSrsIntervalIndex = (): number => SRS_INTERVALS_DAYS.length - 1;
 
+export const isSessionMastered = (intervalIndex: number): boolean =>
+  intervalIndex >= maxSrsIntervalIndex();
+
 export const masteredSessionSchedule = (
   fromDate = new Date().toISOString().slice(0, 10),
 ): { intervalIndex: number; lastGrade: "easy"; nextDue: string } => {

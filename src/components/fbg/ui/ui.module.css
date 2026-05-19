@@ -129,6 +129,49 @@
   color: var(--fbg-fg-muted);
 }
 
+.reviewCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.statusBadgeMemorized,
+.statusBadgeLearning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.statusBadgeMemorized {
+  background: color-mix(in srgb, var(--fbg-primary) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fbg-primary) 45%, transparent);
+  color: var(--fbg-primary);
+}
+
+.statusBadgeMemorized .materialIcon {
+  font-size: 0.95rem;
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 20;
+}
+
+.statusBadgeLearning {
+  background: color-mix(in srgb, var(--fbg-warn) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fbg-warn) 35%, transparent);
+  color: var(--fbg-warn);
+}
+
+.statusBadgeLearning .materialIcon {
+  font-size: 0.95rem;
+}
+
 .progressBar {
   height: 4px;
   background: var(--fbg-bg-soft);
@@ -231,6 +274,19 @@
   letter-spacing: 0.06em;
   color: var(--fbg-fg-muted);
   margin: 0.25rem 0 0;
+}
+
+.metricValueMemorized {
+  color: var(--fbg-primary);
+}
+
+.metricValueLearning {
+  color: var(--fbg-warn);
+}
+
+.memorizePageFooter {
+  padding-bottom: calc(var(--fbg-nav-height) + 1.5rem);
+  margin-top: 0.5rem;
 }
 
 .materialIcon {

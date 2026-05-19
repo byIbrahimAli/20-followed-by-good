@@ -10,10 +10,9 @@ import styles from "@/components/fbg/fbg.module.css";
 import ListenButton from "@/components/fbg/ListenButton";
 import ReciteArabicButton from "@/components/fbg/ReciteArabicButton";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
-import ProgressBar from "@/components/fbg/ui/ProgressBar";
 import ui from "@/components/fbg/ui/ui.module.css";
 import { normalizeArabic } from "@/lib/fbg/normalize-arabic";
-import { computeRetentionPercent } from "@/lib/fbg/srs";
+import { isSessionMastered } from "@/lib/fbg/srs";
 import {
   getSrsSession,
   markSrsSessionMastered,
@@ -120,8 +119,7 @@ export default function MemorizePage() {
     return <p className={styles.pageLead}>Session not found.</p>;
   }
 
-  const progressPercent = computeRetentionPercent(session.intervalIndex);
-  const isMastered = progressPercent >= 100;
+  const isMastered = isSessionMastered(session.intervalIndex);
 
   return (
     <>
@@ -133,6 +131,7 @@ export default function MemorizePage() {
             <p className={styles.meta}>
               {session.surahName} · {session.verseKey}
             </p>
+            <p className={styles.meta}>Tap a word to reveal it.</p>
             <BlurVerse revealedAll={arabicRevealed} text={session.arabicText} />
             <BlurRevealText
               className={styles.translation}
@@ -169,11 +168,6 @@ export default function MemorizePage() {
             <ListenButton verseKey={session.verseKey} />
           </div>
 
-          <div className={ui.progressRow}>
-            <p className={ui.progressLabel}>Memorization progress</p>
-            <p className={ui.progressPercent}>{progressPercent}%</p>
-          </div>
-          <ProgressBar percent={progressPercent} />
         </div>
 
         <section aria-label="Recall practice" className={ui.memorizeRecallBlock}>
@@ -233,36 +227,38 @@ export default function MemorizePage() {
         </section>
       </div>
 
-      {undoSnapshot ? (
-        <div className={ui.undoBar} role="status">
-          <span>
-            Marked memorized (100%)
-            {undoSecondsLeft > 0 ? ` · ${undoSecondsLeft}s` : ""}
-          </span>
-          <button className={ui.undoBtn} onClick={handleUndo} type="button">
-            Undo
-          </button>
-        </div>
-      ) : null}
+      <div className={ui.memorizePageFooter}>
+        {undoSnapshot ? (
+          <div className={ui.undoBar} role="status">
+            <span>
+              Marked as memorized
+              {undoSecondsLeft > 0 ? ` · ${undoSecondsLeft}s` : ""}
+            </span>
+            <button className={ui.undoBtn} onClick={handleUndo} type="button">
+              Undo
+            </button>
+          </div>
+        ) : null}
 
-      <button
-        className={styles.primaryButton}
-        disabled={isMastered || Boolean(undoSnapshot)}
-        onClick={handleGotIt}
-        type="button"
-      >
-        {isMastered ? "Memorized" : "Got it"}
-      </button>
-
-      {isMastered && !undoSnapshot ? (
         <button
-          className={styles.secondaryButton}
-          onClick={() => router.push("/memorize")}
+          className={styles.primaryButton}
+          disabled={isMastered || Boolean(undoSnapshot)}
+          onClick={handleGotIt}
           type="button"
         >
-          Back to Memorize hub
+          {isMastered ? "Memorized" : "Got it"}
         </button>
-      ) : null}
+
+        {isMastered && !undoSnapshot ? (
+          <button
+            className={styles.secondaryButton}
+            onClick={() => router.push("/memorize")}
+            type="button"
+          >
+            Back to Memorize hub
+          </button>
+        ) : null}
+      </div>
     </>
   );
 }

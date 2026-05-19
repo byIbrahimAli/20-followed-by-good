@@ -99,8 +99,8 @@ test.describe("recovery flow", () => {
     await page.getByRole("link", { name: "Memorize" }).click();
 
     await expect(page.getByRole("heading", { name: "Memorize" })).toBeVisible();
-    await expect(page.getByText("Avg progress")).toBeVisible();
-    await expect(page.getByText(/% retention/).first()).toBeVisible();
+    await expect(page.getByText("Memorized")).toBeVisible();
+    await expect(page.getByText("Learning")).toBeVisible();
   });
 
   test("save for later adds to memorize and shows home notice", async ({ page }) => {
