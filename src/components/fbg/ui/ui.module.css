@@ -6,6 +6,11 @@
   padding: 0.5rem 0 1rem;
 }
 
+.topBarSpacer {
+  width: 2.5rem;
+  flex-shrink: 0;
+}
+
 .topBarTitle {
   font-family: var(--font-playfair), Georgia, serif;
   font-size: 1.25rem;

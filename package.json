@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "test:e2e": "PLAYWRIGHT_MOCK_API=1 playwright test",
     "smoke:config": "node ./test/smoke-config.cjs",
+    "smoke:oauth": "node ./scripts/smoke-oauth.cjs",
     "smoke:routes": "node ./test/smoke-routes.cjs",
     "sdk:status": "node ./scripts/sdk-status.cjs",
     "sdk:local": "node ./scripts/sdk-local.cjs",

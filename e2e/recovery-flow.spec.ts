@@ -19,6 +19,17 @@ const mockAssignment = {
 test.describe("recovery flow", () => {
   test.beforeEach(async ({ page }) => {
     if (process.env.PLAYWRIGHT_MOCK_API === "1") {
+      await page.route("**/api/fbg/audio**", async (route) => {
+        await route.fulfill({
+          status: 502,
+          contentType: "application/json",
+          body: JSON.stringify({
+            error: "Audio unavailable in test.",
+            ok: false,
+          }),
+        });
+      });
+
       await page.route("**/api/fbg/assign", async (route) => {
         if (route.request().method() === "POST") {
           await route.fulfill({
@@ -56,6 +67,10 @@ test.describe("recovery flow", () => {
     await expect(page.getByText("Good and evil are not equal.")).toBeVisible({
       timeout: 15_000,
     });
+
+    await page.getByRole("button", { name: "Listen" }).click();
+    await expect(page.getByRole("button", { name: "Retry" })).toBeVisible();
+    await expect(page.getByText("Good and evil are not equal.")).toBeVisible();
 
     await page.getByRole("button", { name: "Begin memorizing" }).click();
 

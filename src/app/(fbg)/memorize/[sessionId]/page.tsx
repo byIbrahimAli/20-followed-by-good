@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import BlurVerse from "@/components/fbg/blur-verse";
+import ListenButton from "@/components/fbg/ListenButton";
 import DiffFeedback from "@/components/fbg/diff-feedback";
 import styles from "@/components/fbg/fbg.module.css";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
@@ -43,7 +44,7 @@ export default function MemorizePage() {
 
   return (
     <>
-      <TopAppBar showMenu={false} title="SRS session" />
+      <TopAppBar title="SRS session" />
 
       <section className={ui.srsCard}>
         <p className={styles.meta}>
@@ -63,6 +64,7 @@ export default function MemorizePage() {
       <DiffFeedback actual={recallText} expected={session.translationText} />
 
       <div className={styles.actionRow}>
+        <ListenButton className={ui.stubBtn} verseKey={session.verseKey} />
         <button
           className={styles.secondaryButton}
           onClick={() => setRevealAll(true)}

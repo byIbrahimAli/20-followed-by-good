@@ -1,21 +1,47 @@
 import { describe, expect, it } from "vitest";
 
-import { parseTranslationIds } from "@/lib/env";
+import { detectMixedQfEnvironment, normalizeContentBaseUrl } from "@/lib/env";
 
-describe("parseTranslationIds", () => {
-  it("uses the default translation when value is missing", () => {
-    expect(parseTranslationIds(undefined)).toEqual([131]);
+describe("normalizeContentBaseUrl", () => {
+  it("appends /content when the gateway root is provided", () => {
+    expect(normalizeContentBaseUrl("https://apis-prelive.quran.foundation")).toBe(
+      "https://apis-prelive.quran.foundation/content",
+    );
   });
 
-  it("parses comma-separated numeric ids", () => {
-    expect(parseTranslationIds("131,20, 149 ")).toEqual([131, 20, 149]);
+  it("leaves URLs that already end with /content unchanged", () => {
+    expect(normalizeContentBaseUrl("https://apis.quran.foundation/content/")).toBe(
+      "https://apis.quran.foundation/content",
+    );
   });
 
-  it("ignores invalid translation values", () => {
-    expect(parseTranslationIds("abc,-1,0, 7")).toEqual([7]);
+  it("returns undefined for empty input", () => {
+    expect(normalizeContentBaseUrl(undefined)).toBeUndefined();
+  });
+});
+
+describe("detectMixedQfEnvironment", () => {
+  it("warns when prelive OAuth is paired with production gateway", () => {
+    expect(
+      detectMixedQfEnvironment("https://prelive-oauth2.quran.foundation", {
+        gatewayUrl: "https://apis.quran.foundation",
+      }),
+    ).toContain("Mixed Quran Foundation");
   });
 
-  it("falls back to default when all values are invalid", () => {
-    expect(parseTranslationIds("a,b,0")).toEqual([131]);
+  it("allows consistent production hosts", () => {
+    expect(
+      detectMixedQfEnvironment("https://oauth2.quran.foundation", {
+        gatewayUrl: "https://apis.quran.foundation",
+      }),
+    ).toBeNull();
+  });
+
+  it("allows consistent prelive hosts", () => {
+    expect(
+      detectMixedQfEnvironment("https://prelive-oauth2.quran.foundation", {
+        gatewayUrl: "https://apis-prelive.quran.foundation",
+      }),
+    ).toBeNull();
   });
 });

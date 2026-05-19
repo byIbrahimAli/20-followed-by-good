@@ -18,15 +18,26 @@ npm install
 cp .env.example .env.local
 ```
 
-Set these required values in `.env.local`:
+Set these required values in `.env.local` (see [`.env.local.example`](./.env.local.example)):
 
 - `PORT` (optional, defaults to `3000`)
 - `APP_BASE_URL`
-- `CLIENT_ID`
-- `CLIENT_SECRET`
-- `SESSION_SECRET`
+- `CLIENT_ID` and `CLIENT_SECRET` from [Quran Foundation](https://api-docs.quran.foundation/request-access/)
+- `SESSION_SECRET` (long random string)
 
-**Pre-production vs production:** Leave service URL overrides unset to use production (`oauth2.quran.foundation` / `apis.quran.foundation`). For Quran Foundation test credentials, set `OAUTH2_BASE_URL`, `TOKEN_HOST`, and the `*_BASE_URL` / `GATEWAY_URL` vars to the prelive hosts — see the commented block in `.env.example`. Secrets belong only in `.env.local` (gitignored).
+**Production (recommended):** Use your production client credentials and **omit** all `*_BASE_URL` / `GATEWAY_URL` overrides — the SDK defaults to `oauth2.quran.foundation` and `apis.quran.foundation`.
+
+**Pre-production:** Use prelive credentials **and** the full prelive host block in `.env.example`. Never mix prelive OAuth with production API hosts.
+
+**OAuth:** The server fetches short-lived access tokens automatically (`client_credentials` + `scope=content`). You do not paste tokens into `.env.local`. Verify setup:
+
+```bash
+npm run smoke:oauth
+```
+
+Docs: [QF quickstart](https://api-docs.quran.foundation/docs/quickstart/) · [Token exchange](https://api-docs.quran.foundation/docs/oauth2_apis_versioned/1.0.0/oauth-2-token-exchange/)
+
+**Sign-in (optional):** Register `http://localhost:3000/callback` as a redirect URI in the QF portal. Production clients may not have user/OAuth features enabled by default.
 
 ## 2. Choose SDK source
 
@@ -59,6 +70,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## 4. Verify quickly
 
 ```bash
+npm run smoke:oauth
 npm run lint
 npm run build
 npm test

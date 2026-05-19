@@ -30,11 +30,12 @@ Bad deeds happen. **Followed By Good** helps you respond with restorative accoun
 |--------|-----------|----------------------|
 | Ayah assignment (search) | `POST /api/fbg/assign` → `GET /api/search` | Search API (content) |
 | Ayah text & translation | `POST /api/fbg/assign` → `GET /api/reader/[chapterId]` | Reader / Content API |
+| Listen (recitation) | `GET /api/fbg/audio?verseKey=` | Content Audio API (verse recitation) |
 | Dashboard intentions (signed in) | `GET /api/bootstrap` | Goals API (`goals` scope) |
 | Save for later (signed in) | `POST /api/collections` | Collections API |
 | Developer toolkit | `/developer`, `/api/*` | Bootstrap, notes, bookmarks, etc. |
 
-**Content APIs:** Search + Reader power the Recovery Loop ayah assignment. **User APIs:** Goals (today’s plan) and Collections (save ayah) when OAuth session is present; slips and SRS schedules stay in `localStorage` for privacy in v1.
+**Content APIs:** Search + Reader power the Recovery Loop ayah assignment; Audio API powers Listen on assign and memorize. **User APIs:** Goals (today’s plan) and Collections (save ayah) when OAuth session is present; slips and SRS schedules stay in `localStorage` for privacy in v1.
 
 ### Demo checklist (mobile UI + recovery loop)
 
@@ -45,7 +46,7 @@ Bad deeds happen. **Followed By Good** helps you respond with restorative accoun
 5. Bottom tabs: **Home** (`/`), **Memorize** (`/memorize` hub), **Community** (`/community` mock).
 6. Optional: `/?demo=1` seeds a due Anger review card.
 
-**APIs hit:** `POST /api/fbg/assign` (Search → Reader → demo fallback), `GET /api/fbg/assign?id=`, `GET /api/bootstrap` (goals when signed in), optional `POST /api/collections`.
+**APIs hit:** `POST /api/fbg/assign` (Search → Reader → demo fallback), `GET /api/fbg/assign?id=`, `GET /api/fbg/audio?verseKey=`, `GET /api/bootstrap` (goals when signed in), optional `POST /api/collections`.
 
 ```bash
 npm run lint && npm run build && npm test && npm run test:e2e
@@ -73,9 +74,16 @@ npm run lint && npm run build && npm test && npm run test:e2e
 - **Activity & Goals** — daily check-ins
 - **Collections** — memorisation sets / decks
 
-### Auth (starter)
+### Auth (Quran Foundation OAuth2)
 
-- OAuth2 + `@quranjs/api` BFF — session and user-scoped routes via `/api/*`
+Two token types (see [QF quickstart](https://api-docs.quran.foundation/docs/quickstart/)):
+
+| Token | How | Used for |
+|-------|-----|----------|
+| **App token** | `POST /oauth2/token` · `grant_type=client_credentials` · `scope=content` | Search, Reader, Audio (`/api/fbg/assign`, `/api/fbg/audio`, `/api/search`) — automatic via `@quranjs/api` server client |
+| **User token** | Authorization code · `/api/auth/start` → `/callback` | Collections, goals, notes (signed-in features; may require QF to enable user scopes on production) |
+
+Verify credentials: `npm run smoke:oauth`
 
 ## 🛠 Tech stack
 
@@ -90,7 +98,7 @@ npm install
 cp .env.example .env.local
 ```
 
-Set in `.env.local`: `APP_BASE_URL`, `CLIENT_ID`, `CLIENT_SECRET`, `SESSION_SECRET` (and optional `PORT`). For **pre-production** OAuth/API testing, also set `OAUTH2_BASE_URL`, `TOKEN_HOST`, and the `apis-prelive.quran.foundation` service URLs — see `.env.example` (placeholders only; never commit secrets).
+Set in `.env.local`: `APP_BASE_URL`, `CLIENT_ID`, `CLIENT_SECRET`, `SESSION_SECRET` (and optional `PORT`). For **production**, omit service URL overrides. For **prelive**, use the full prelive block in `.env.example` — never mix environments. Run `npm run smoke:oauth` before `npm run dev`.
 
 For **Stitch MCP** in Cursor, export your key (never commit it):
 

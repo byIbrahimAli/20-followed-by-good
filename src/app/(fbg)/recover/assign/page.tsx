@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 import styles from "@/components/fbg/fbg.module.css";
+import ListenButton from "@/components/fbg/ListenButton";
 import GlassCard from "@/components/fbg/ui/GlassCard";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
 import ui from "@/components/fbg/ui/ui.module.css";
@@ -175,7 +176,7 @@ function AssignContent() {
 
   return (
     <>
-      <TopAppBar showMenu={false} title="Ayah assignment" />
+      <TopAppBar title="Ayah assignment" />
 
       <p className={ui.contextBanner}>For: {contextLabel}</p>
 
@@ -192,9 +193,7 @@ function AssignContent() {
       </GlassCard>
 
       <div className={ui.actionStubRow}>
-        <button className={ui.stubBtn} type="button">
-          <span className={ui.materialIcon}>headphones</span> Listen
-        </button>
+        <ListenButton verseKey={assignment.verseKey} />
         <button className={ui.stubBtn} type="button">
           <span className={ui.materialIcon}>menu_book</span> Tafsir
         </button>

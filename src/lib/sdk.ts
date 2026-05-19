@@ -55,6 +55,11 @@ interface ServerAuthClient {
 
 interface ServerContentClient {
   v4: {
+    audio?: {
+      verseRecitation?: {
+        byKey?: (verseKey: string, recitationId: string) => Promise<unknown>;
+      };
+    };
     chapters: {
       get: (chapterId: string) => Promise<unknown>;
       list: () => Promise<unknown>;
@@ -87,7 +92,15 @@ export interface PublicClient {
   oauth2: OAuth2PublicClient;
 }
 
+interface ServerAudioClient {
+  findVerseRecitationsByKey?: (
+    verseKey: string,
+    recitationId: string,
+  ) => Promise<unknown>;
+}
+
 export interface ServerClient {
+  audio?: ServerAudioClient;
   auth: ServerAuthClient;
   content: ServerContentClient;
   oauth2: OAuth2ServerClient;
