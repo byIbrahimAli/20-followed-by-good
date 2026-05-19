@@ -1,9 +1,11 @@
+@import "./fbg-tokens.css";
+
 :root {
-  --bg-base: #020916;
-  --bg-elevated: #07112a;
-  --fg-base: #e8f3ff;
-  --fg-muted: #9eb9db;
-  --border-soft: rgba(124, 170, 238, 0.22);
+  --bg-base: var(--fbg-bg-base);
+  --bg-elevated: var(--fbg-bg-elevated);
+  --fg-base: var(--fbg-fg-base);
+  --fg-muted: var(--fbg-fg-muted);
+  --border-soft: var(--fbg-border-soft);
 }
 
 * {
@@ -19,13 +21,18 @@ body {
 }
 
 body {
-  background:
-    radial-gradient(circle at 10% 10%, rgba(108, 151, 233, 0.2), transparent 30%),
-    radial-gradient(circle at 80% 4%, rgba(126, 224, 206, 0.15), transparent 34%),
-    linear-gradient(180deg, #020611, #020917 44%, #030c1d);
+  background: var(--fbg-bg-night);
   color: var(--fg-base);
-  font-family: var(--font-plus-jakarta), "Segoe UI", sans-serif;
+  font-family: var(--font-inter), "Segoe UI", sans-serif;
   line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 a {

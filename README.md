@@ -24,6 +24,41 @@ Bad deeds happen. **Followed By Good** helps you respond with restorative accoun
 | **Team** | Per hackathon rules |
 | **Submission** | Demo link, 2–3 min video, API usage write-up |
 
+## API usage (hackathon submission)
+
+| Feature | BFF route | Quran Foundation API |
+|--------|-----------|----------------------|
+| Ayah assignment (search) | `POST /api/fbg/assign` → `GET /api/search` | Search API (content) |
+| Ayah text & translation | `POST /api/fbg/assign` → `GET /api/reader/[chapterId]` | Reader / Content API |
+| Dashboard intentions (signed in) | `GET /api/bootstrap` | Goals API (`goals` scope) |
+| Save for later (signed in) | `POST /api/collections` | Collections API |
+| Developer toolkit | `/developer`, `/api/*` | Bootstrap, notes, bookmarks, etc. |
+
+**Content APIs:** Search + Reader power the Recovery Loop ayah assignment. **User APIs:** Goals (today’s plan) and Collections (save ayah) when OAuth session is present; slips and SRS schedules stay in `localStorage` for privacy in v1.
+
+### Demo checklist (mobile UI + recovery loop)
+
+1. **Desktop** — open `/` on a wide screen; app appears as a centered **390×844** phone frame on `#0A0A0A` night background.
+2. **Home** — “What slipped today?” card, chips, **In review** horizontal scroller, community bento (mock).
+3. Log a slip → **Continue** → assign page shows Arabic + translation (Search + Reader APIs, or demo fallback on prelive).
+4. **Begin memorizing** → SRS session → grade **Easy** → home **In review** updates.
+5. Bottom nav: home, study (`/recover` redirects to home `#moment`), community mock at `/community`.
+6. Optional: `/?demo=1` seeds a due Anger review card.
+
+**APIs hit:** `POST /api/fbg/assign` (Search → Reader → demo fallback), `GET /api/fbg/assign?id=`, `GET /api/bootstrap` (goals when signed in), optional `POST /api/collections`.
+
+```bash
+npm run lint && npm run build && npm test && npm run test:e2e
+```
+
+### Manual test flow
+
+1. Open `/` — dashboard with slip card and review queue.
+2. Bottom command bar or home textarea — log a slip, **Continue**.
+3. Assign page — **Begin memorizing** or **Save for later**.
+4. `/memorize/[sessionId]` — blur, type recall, grade easy/hard.
+5. Return to `/` — item appears in **In review**.
+
 ## 🔌 APIs we're using
 
 ### Content

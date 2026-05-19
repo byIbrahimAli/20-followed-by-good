@@ -63,7 +63,7 @@ interface StarterShellProps {
 }
 
 const navigationItems: Array<{ href: string; key: StarterRoute; label: string }> = [
-  { href: "/", key: "home", label: "Home" },
+  { href: "/developer", key: "home", label: "Home" },
   { href: "/read/1", key: "reader", label: "Reader" },
   { href: "/search", key: "search", label: "Search" },
   { href: "/library", key: "library", label: "Library" },

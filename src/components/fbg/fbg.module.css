@@ -1,0 +1,215 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: var(--fbg-bg-base);
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--fbg-margin-mobile) var(--fbg-shell-pad);
+  -webkit-overflow-scrolling: touch;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.pageLead {
+  color: var(--fbg-fg-muted);
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.card {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid var(--fbg-border-soft);
+  border-radius: var(--fbg-radius-card);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(149, 211, 186, 0.15);
+  color: var(--fbg-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.chip {
+  border: 1px solid var(--fbg-border-soft);
+  background: var(--fbg-bg-soft);
+  color: var(--fbg-fg-base);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--fbg-primary);
+}
+
+.primaryButton {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, var(--fbg-primary-dim), #0d9488);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.primaryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  width: 100%;
+  border: 1px solid var(--fbg-border-soft);
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: var(--fbg-fg-base);
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.arabic {
+  font-family: var(--font-noto-arabic), "Traditional Arabic", serif;
+  font-size: 1.5rem;
+  line-height: 2;
+  text-align: right;
+  direction: rtl;
+  margin: 0.75rem 0;
+}
+
+.translation {
+  color: var(--fbg-fg-muted);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: var(--fbg-fg-muted);
+  margin-bottom: 0.5rem;
+}
+
+.tafsir {
+  font-size: 0.9rem;
+  color: var(--fbg-fg-base);
+  border-left: 3px solid var(--fbg-primary);
+  padding-left: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.progressBar {
+  height: 0.35rem;
+  background: var(--fbg-bg-soft);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--fbg-primary-dim), var(--fbg-primary));
+  border-radius: 999px;
+}
+
+.diffLineMatch {
+  color: var(--fbg-primary);
+}
+
+.diffLineMiss {
+  color: var(--fbg-warn);
+}
+
+.blurWord {
+  display: inline-block;
+  margin: 0 0.15rem;
+  padding: 0.1rem 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  background: var(--fbg-bg-soft);
+  filter: blur(4px);
+  user-select: none;
+}
+
+.blurWordRevealed {
+  filter: none;
+  background: transparent;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 7rem;
+  border-radius: var(--fbg-radius-card);
+  border: 1px solid var(--fbg-border-soft);
+  background: var(--fbg-bg-charcoal);
+  color: var(--fbg-fg-base);
+  padding: 0.75rem;
+  resize: vertical;
+}
+
+.banner {
+  background: rgba(149, 211, 186, 0.12);
+  border: 1px solid var(--fbg-border-soft);
+  border-radius: var(--fbg-radius-card);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.85rem;
+  color: var(--fbg-fg-muted);
+  margin-bottom: 1rem;
+}
+
+.nudgeCard {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid var(--fbg-border-soft);
+  border-radius: var(--fbg-radius-card);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.nudgeLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fbg-primary);
+  margin-bottom: 0.35rem;
+}
+
+.actionRow {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.actionRow button {
+  flex: 1;
+  min-width: 7rem;
+}

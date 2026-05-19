@@ -1,5 +1,5 @@
 import StarterShell from "@/components/starter-shell";
 
-export default function HomePage() {
+export default function DeveloperPage() {
   return <StarterShell route="home" />;
 }

@@ -1,15 +1,15 @@
 export const starterConfig = {
   app: {
     description:
-      "Reader-first Quran Foundation starter powered by the official SDK.",
-    name: "Quran Foundation Starter",
-    shortName: "QF Starter",
+      "Turn slips into restorative Quran-backed habits — log, receive an ayah, memorize, and grow.",
+    name: "Followed By Good",
+    shortName: "FBG",
   },
   branding: {
-    accent: "#55d5ff",
-    background: "#020617",
-    card: "#0b1228",
-    text: "#e5e7eb",
+    accent: "#40916c",
+    background: "#1a1f1e",
+    card: "#232a28",
+    text: "#f0f4f2",
   },
   defaults: {
     chapterId: "1",

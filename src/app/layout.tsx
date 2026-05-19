@@ -1,17 +1,24 @@
 import type { Metadata } from "next";
 import {
+  Inter,
   Noto_Naskh_Arabic,
-  Plus_Jakarta_Sans,
+  Playfair_Display,
   Space_Mono,
 } from "next/font/google";
 
 import { starterConfig } from "../../starter.config";
 import "./globals.css";
 
-const bodyFont = Plus_Jakarta_Sans({
+const bodyFont = Inter({
   subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
+});
+
+const displayFont = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  weight: ["500", "600", "700"],
 });
 
 const arabicFont = Noto_Naskh_Arabic({
@@ -38,8 +45,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${bodyFont.variable} ${arabicFont.variable} ${monoFont.variable}`}
+        className={`${bodyFont.variable} ${displayFont.variable} ${arabicFont.variable} ${monoFont.variable}`}
       >
         {children}
       </body>

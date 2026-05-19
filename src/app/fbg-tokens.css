@@ -1,0 +1,26 @@
+:root {
+  /* Stitch palette */
+  --fbg-primary: #95d3ba;
+  --fbg-primary-dim: #064e3b;
+  --fbg-bg-night: #0a0a0a;
+  --fbg-bg-base: #131412;
+  --fbg-bg-charcoal: #121212;
+  --fbg-surface-container: #1a1a19;
+  --fbg-bg-elevated: var(--fbg-surface-container);
+  --fbg-bg-soft: #1e1e1d;
+  --fbg-fg-base: #f5f5f4;
+  --fbg-fg-muted: #a8a29e;
+  --fbg-emerald: #95d3ba;
+  --fbg-emerald-soft: #b8e6d4;
+  --fbg-emerald-glow: rgba(149, 211, 186, 0.35);
+  --fbg-border-soft: rgba(168, 162, 158, 0.2);
+  --fbg-outline-variant: rgba(168, 162, 158, 0.35);
+  --fbg-error-container: rgba(127, 29, 29, 0.45);
+  --fbg-error-fg: #fca5a5;
+  --fbg-warn: #d4a574;
+  --fbg-radius-card: 24px;
+  --fbg-section-gap: 1.5rem;
+  --fbg-margin-mobile: 1rem;
+  --fbg-shell-pad: 5.75rem;
+  --fbg-nav-height: 4.5rem;
+}

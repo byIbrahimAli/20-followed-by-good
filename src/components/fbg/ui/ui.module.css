@@ -1,0 +1,360 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.topBarTitle {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.iconButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--fbg-outline-variant);
+  background: var(--fbg-bg-charcoal);
+  color: var(--fbg-fg-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--fbg-outline-variant);
+  background: var(--fbg-primary-dim);
+  color: var(--fbg-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.glassCard {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 1.25rem;
+  margin-bottom: var(--fbg-section-gap);
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fbg-fg-muted);
+  margin-bottom: 0.5rem;
+}
+
+.chip {
+  border: 1px solid var(--fbg-outline-variant);
+  background: var(--fbg-bg-soft);
+  color: var(--fbg-fg-base);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chipError {
+  border: 1px solid rgba(252, 165, 165, 0.35);
+  background: var(--fbg-error-container);
+  color: var(--fbg-error-fg);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.reviewScroller {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin: 0 -0.25rem;
+  scroll-snap-type: x mandatory;
+}
+
+.reviewCard {
+  flex: 0 0 78%;
+  max-width: 280px;
+  scroll-snap-align: start;
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.reviewArabic {
+  font-family: var(--font-noto-arabic), serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  text-align: right;
+  direction: rtl;
+  margin: 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.reviewMeta {
+  font-size: 0.75rem;
+  color: var(--fbg-fg-muted);
+}
+
+.progressBar {
+  height: 4px;
+  background: var(--fbg-bg-soft);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.65rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--fbg-primary-dim), var(--fbg-primary));
+  box-shadow: 0 0 12px var(--fbg-emerald-glow);
+  border-radius: 999px;
+}
+
+.bottomNav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  padding: 0.65rem var(--fbg-margin-mobile) calc(0.65rem + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, var(--fbg-bg-base) 24%);
+}
+
+.bottomNavInner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid var(--fbg-outline-variant);
+  border-radius: 999px;
+  padding: 0.35rem 0.35rem 0.35rem 1rem;
+}
+
+.bottomInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--fbg-fg-base);
+  outline: none;
+  min-width: 0;
+  font-size: 0.85rem;
+}
+
+.bottomInput::placeholder {
+  color: var(--fbg-fg-muted);
+}
+
+.navIcons {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.navIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--fbg-fg-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.navIconActive {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--fbg-primary-dim);
+  color: var(--fbg-primary);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.micBtn,
+.submitBtn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.micBtn {
+  background: var(--fbg-bg-soft);
+  color: var(--fbg-fg-muted);
+}
+
+.submitBtn {
+  background: var(--fbg-primary);
+  color: var(--fbg-bg-night);
+}
+
+.materialIcon {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bentoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: var(--fbg-section-gap);
+}
+
+.bentoWide {
+  grid-column: 1 / -1;
+}
+
+.bentoCard {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 1rem;
+}
+
+.bentoLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fbg-primary);
+  margin-bottom: 0.35rem;
+}
+
+.slipTextarea {
+  width: 100%;
+  min-height: 5.5rem;
+  border: none;
+  background: transparent;
+  color: var(--fbg-fg-base);
+  resize: none;
+  outline: none;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.slipTextarea::placeholder {
+  color: var(--fbg-fg-muted);
+}
+
+.hadithQuote {
+  font-size: 0.8rem;
+  color: var(--fbg-fg-muted);
+  font-style: italic;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--fbg-border-soft);
+  padding-top: 0.75rem;
+}
+
+.primaryGradient {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(135deg, var(--fbg-primary-dim), #0d9488);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+}
+
+.contextBanner {
+  font-size: 0.8rem;
+  color: var(--fbg-primary);
+  margin-bottom: 0.75rem;
+}
+
+.actionStubRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.stubBtn {
+  flex: 1;
+  border: 1px solid var(--fbg-outline-variant);
+  border-radius: 999px;
+  padding: 0.65rem;
+  background: transparent;
+  color: var(--fbg-fg-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.srsCard {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 20%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 1.25rem;
+  margin-bottom: var(--fbg-section-gap);
+  min-height: 12rem;
+}
+
+.srsInputBar {
+  position: absolute;
+  bottom: var(--fbg-nav-height);
+  left: 0;
+  right: 0;
+  padding: 0.75rem var(--fbg-margin-mobile);
+}
+
+.srsInput {
+  width: 100%;
+  border: 1px dashed var(--fbg-outline-variant);
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  background: var(--fbg-bg-charcoal);
+  color: var(--fbg-fg-base);
+  outline: none;
+}
+
+.srsInput::placeholder {
+  color: var(--fbg-fg-muted);
+}

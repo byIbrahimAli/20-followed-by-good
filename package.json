@@ -9,6 +9,7 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "PLAYWRIGHT_MOCK_API=1 playwright test",
     "smoke:config": "node ./test/smoke-config.cjs",
     "smoke:routes": "node ./test/smoke-routes.cjs",
     "sdk:status": "node ./scripts/sdk-status.cjs",
@@ -24,6 +25,7 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
     "@testing-library/react": "^16.1.0",
     "@types/node": "^20",
     "@types/react": "^18",
