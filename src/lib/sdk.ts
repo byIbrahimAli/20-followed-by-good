@@ -129,22 +129,22 @@ const loadRuntimeSplitSdk = async (): Promise<RuntimeSplitSdk> => {
   try {
     const publicModule = await dynamicImport("@quranjs/api/public");
     const serverModule = await dynamicImport("@quranjs/api/server");
-    const createPublicClient = publicModule.createPublicClient;
-    const createServerClient = serverModule.createServerClient;
+    const createPublicClientFn = publicModule.createPublicClient;
+    const createServerClientFn = serverModule.createServerClient;
 
-    if (typeof createPublicClient !== "function") {
+    if (typeof createPublicClientFn !== "function") {
       throw new Error("createPublicClient is not available.");
     }
 
-    if (typeof createServerClient !== "function") {
+    if (typeof createServerClientFn !== "function") {
       throw new Error("createServerClient is not available.");
     }
 
     cachedSdk = {
-      createPublicClient: createPublicClient as (
+      createPublicClient: createPublicClientFn as (
         options: UnknownRecord,
       ) => PublicClient,
-      createServerClient: createServerClient as (
+      createServerClient: createServerClientFn as (
         options: UnknownRecord,
       ) => ServerClient,
     };
@@ -157,28 +157,34 @@ const loadRuntimeSplitSdk = async (): Promise<RuntimeSplitSdk> => {
   }
 };
 
-const createLiveSafeFetch = (fetchImpl: typeof fetch) => async (url: string, options?: RequestInit) => {
-  const requestUrl = new URL(String(url));
+const createLiveSafeFetch = (fetchImpl: typeof fetch): typeof fetch => {
+  const wrappedFetch: typeof fetch = async (input, options) => {
+    const requestUrl = new URL(
+      input instanceof Request ? input.url : String(input),
+    );
 
-  if (requestUrl.pathname.endsWith("/v1/collections")) {
-    const sortBy = requestUrl.searchParams.get("sort_by");
+    if (requestUrl.pathname.endsWith("/v1/collections")) {
+      const sortBy = requestUrl.searchParams.get("sort_by");
 
-    if (sortBy) {
-      requestUrl.searchParams.delete("sort_by");
-      requestUrl.searchParams.set("sortBy", sortBy);
+      if (sortBy) {
+        requestUrl.searchParams.delete("sort_by");
+        requestUrl.searchParams.set("sortBy", sortBy);
+      }
     }
-  }
 
-  if (requestUrl.pathname.endsWith("/v1/bookmarks")) {
-    const mushafId = requestUrl.searchParams.get("mushaf_id");
+    if (requestUrl.pathname.endsWith("/v1/bookmarks")) {
+      const mushafId = requestUrl.searchParams.get("mushaf_id");
 
-    if (mushafId) {
-      requestUrl.searchParams.delete("mushaf_id");
-      requestUrl.searchParams.set("mushafId", mushafId);
+      if (mushafId) {
+        requestUrl.searchParams.delete("mushaf_id");
+        requestUrl.searchParams.set("mushafId", mushafId);
+      }
     }
-  }
 
-  return fetchImpl(requestUrl.toString(), options);
+    return fetchImpl(requestUrl.toString(), options);
+  };
+
+  return wrappedFetch;
 };
 
 interface SessionStorageAdapter {

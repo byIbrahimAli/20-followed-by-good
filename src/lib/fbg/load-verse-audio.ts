@@ -103,23 +103,6 @@ const loadViaHttp = async (
   return (await response.json()) as VerseRecitationResponse;
 };
 
-const loadVerseRecitationPayload = async (
-  serverClient: ServerClientWithAudio,
-  verseKey: string,
-  recitationId: string,
-): Promise<VerseRecitationResponse> => {
-  try {
-    return await loadViaHttp(verseKey, recitationId);
-  } catch (httpError) {
-    const sdkLoader = resolveSdkLoader(serverClient);
-    if (!sdkLoader) {
-      throw httpError;
-    }
-
-    return sdkLoader(verseKey, recitationId);
-  }
-};
-
 export const loadVerseAudio = async (
   session: StoredSession,
   verseKey: string,
@@ -128,12 +111,24 @@ export const loadVerseAudio = async (
   const id = String(recitationId ?? getDefaultRecitationId());
 
   try {
-    const { serverClient } = await createClients(session);
-    const payload = await loadVerseRecitationPayload(
-      serverClient as ServerClientWithAudio,
-      verseKey,
-      id,
-    );
+    let payload: VerseRecitationResponse;
+
+    try {
+      payload = await loadViaHttp(verseKey, id);
+    } catch (httpError) {
+      try {
+        const { serverClient } = await createClients(session);
+        const sdkLoader = resolveSdkLoader(serverClient as ServerClientWithAudio);
+        if (!sdkLoader) {
+          throw httpError;
+        }
+
+        payload = await sdkLoader(verseKey, id);
+      } catch {
+        throw httpError;
+      }
+    }
+
     const audioUrl = extractAudioUrl(payload);
 
     if (!audioUrl) {

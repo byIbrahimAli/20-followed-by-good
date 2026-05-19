@@ -44,6 +44,7 @@ describe("extractAudioUrl", () => {
 
 describe("loadVerseAudio", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.stubGlobal("fetch", mocks.fetch);
     mocks.getConfig.mockReturnValue({
       clientId: "client-id",
@@ -55,10 +56,21 @@ describe("loadVerseAudio", () => {
     });
   });
 
-  it("uses content.v4.audio when available", async () => {
+  it("falls back to content.v4.audio when HTTP fails", async () => {
     const byKey = vi.fn(async () => ({
       audioFiles: [{ audioUrl: "https://audio.example/39-53.mp3" }],
     }));
+
+    mocks.fetch.mockImplementation(async (url: string) => {
+      if (String(url).includes("/oauth2/token")) {
+        return {
+          ok: true,
+          json: async () => ({ access_token: "app-token", expires_in: 3600 }),
+        };
+      }
+
+      return { ok: false, status: 503, statusText: "Unavailable" };
+    });
 
     mocks.createClients.mockResolvedValue({
       serverClient: {
@@ -78,10 +90,21 @@ describe("loadVerseAudio", () => {
     expect(byKey).toHaveBeenCalledWith("39:53", "7");
   });
 
-  it("falls back to legacy audio.findVerseRecitationsByKey", async () => {
+  it("falls back to legacy audio.findVerseRecitationsByKey when HTTP fails", async () => {
     const findVerseRecitationsByKey = vi.fn(async () => ({
       audioFiles: [{ audioUrl: "https://audio.example/2-255.mp3" }],
     }));
+
+    mocks.fetch.mockImplementation(async (url: string) => {
+      if (String(url).includes("/oauth2/token")) {
+        return {
+          ok: true,
+          json: async () => ({ access_token: "app-token", expires_in: 3600 }),
+        };
+      }
+
+      return { ok: false, status: 503, statusText: "Unavailable" };
+    });
 
     mocks.createClients.mockResolvedValue({
       serverClient: {
@@ -96,12 +119,8 @@ describe("loadVerseAudio", () => {
     expect(findVerseRecitationsByKey).toHaveBeenCalledWith("2:255", "3");
   });
 
-  it("loads via content HTTP before SDK", async () => {
-    mocks.createClients.mockResolvedValue({
-      serverClient: {
-        content: { v4: {} },
-      },
-    });
+  it("loads via content HTTP without calling the SDK", async () => {
+    mocks.createClients.mockRejectedValue(new Error("SDK should not be needed."));
 
     mocks.fetch.mockImplementation(async (url: string) => {
       if (String(url).includes("/oauth2/token")) {
@@ -135,13 +154,26 @@ describe("loadVerseAudio", () => {
         "x-client-id": "client-id",
       },
     });
+    expect(mocks.createClients).not.toHaveBeenCalled();
   });
 
   it("returns a friendly error instead of throwing", async () => {
+    mocks.fetch.mockImplementation(async (url: string) => {
+      if (String(url).includes("/oauth2/token")) {
+        return {
+          ok: true,
+          json: async () => ({ access_token: "app-token", expires_in: 3600 }),
+        };
+      }
+
+      return { ok: false, status: 502, statusText: "Bad Gateway" };
+    });
     mocks.createClients.mockRejectedValue(new Error("SDK unavailable."));
 
     const result = await loadVerseAudio({} as never, "1:1");
 
-    expect(result).toEqual({ error: "SDK unavailable." });
+    expect(result).toEqual({
+      error: "Content audio request failed: 502 Bad Gateway",
+    });
   });
 });
