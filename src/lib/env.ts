@@ -1,11 +1,13 @@
 import { DEFAULT_OAUTH2_BASE_URL } from "@/lib/oauth";
+import { requireAppBaseUrl } from "@/lib/resolve-app-base-url";
 
 const REQUIRED_ENV_VARS = [
-  "APP_BASE_URL",
   "CLIENT_ID",
   "CLIENT_SECRET",
   "SESSION_SECRET",
 ] as const;
+
+export { normalizeAppBaseUrl, resolveAppBaseUrl } from "@/lib/resolve-app-base-url";
 
 const getRequired = (key: string): string => {
   const value = process.env[key];
@@ -175,7 +177,7 @@ export const getConfig = (): RuntimeConfig => {
   warnIfMixedQfEnvironment(oauth2BaseUrl, services);
 
   cachedConfig = {
-    appBaseUrl: getRequired("APP_BASE_URL"),
+    appBaseUrl: requireAppBaseUrl(),
     clientId: getRequired("CLIENT_ID"),
     clientSecret: getRequired("CLIENT_SECRET"),
     defaultReaderChapter: String(

@@ -39,6 +39,8 @@ Docs: [QF quickstart](https://api-docs.quran.foundation/docs/quickstart/) · [To
 
 **Sign-in (optional):** Register `http://localhost:3000/callback` as a redirect URI in the QF portal. Production clients may not have user/OAuth features enabled by default.
 
+**Vercel:** [docs/deploy-vercel.md](./docs/deploy-vercel.md) — build settings, env vars, and automatic `APP_BASE_URL` from Vercel host variables when unset.
+
 ## 2. Choose SDK source
 
 Remote (npm):

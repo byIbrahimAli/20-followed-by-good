@@ -112,6 +112,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+**Vercel:** see [docs/deploy-vercel.md](./docs/deploy-vercel.md) for project settings, env vars, and `APP_BASE_URL` resolution on preview/production.
+
 Starter kit details: see [START_HERE.md](./START_HERE.md) and [docs/](./docs/).
 
 ## 📁 Repo layout

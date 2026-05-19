@@ -4,12 +4,48 @@ const { loadEnvConfig } = require("@next/env");
 
 loadEnvConfig(process.cwd());
 
-const requiredKeys = [
-  "APP_BASE_URL",
-  "CLIENT_ID",
-  "CLIENT_SECRET",
-  "SESSION_SECRET",
-];
+const normalizeAppBaseUrl = (url) => {
+  const trimmed = url.trim().replace(/\/$/, "");
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
+
+/** Mirrors src/lib/resolve-app-base-url.ts */
+const resolveAppBaseUrl = () => {
+  const explicit = process.env.APP_BASE_URL?.trim();
+  if (explicit) {
+    return normalizeAppBaseUrl(explicit);
+  }
+
+  const vercelEnv = process.env.VERCEL_ENV;
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+
+  if (vercelEnv === "production") {
+    const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+    if (productionHost) {
+      return normalizeAppBaseUrl(productionHost);
+    }
+    if (vercelUrl) {
+      return normalizeAppBaseUrl(vercelUrl);
+    }
+    return undefined;
+  }
+
+  if (
+    vercelUrl &&
+    (vercelEnv === "preview" ||
+      vercelEnv === "development" ||
+      vercelEnv === undefined)
+  ) {
+    return normalizeAppBaseUrl(vercelUrl);
+  }
+
+  return undefined;
+};
+
+const requiredKeys = ["CLIENT_ID", "CLIENT_SECRET", "SESSION_SECRET"];
 
 const starterDefaults = {
   APP_BASE_URL: "http://localhost:3000",
@@ -19,7 +55,7 @@ const starterDefaults = {
 };
 
 const smokeEnv = {
-  APP_BASE_URL: process.env.APP_BASE_URL || starterDefaults.APP_BASE_URL,
+  APP_BASE_URL: resolveAppBaseUrl() || starterDefaults.APP_BASE_URL,
   CLIENT_ID: process.env.CLIENT_ID || starterDefaults.CLIENT_ID,
   CLIENT_SECRET: process.env.CLIENT_SECRET || starterDefaults.CLIENT_SECRET,
   SESSION_SECRET: process.env.SESSION_SECRET || starterDefaults.SESSION_SECRET,
