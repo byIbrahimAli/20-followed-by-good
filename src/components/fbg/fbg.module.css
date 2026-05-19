@@ -23,6 +23,7 @@
 }
 
 .demoTicker {
+  position: relative;
   flex-shrink: 0;
   height: var(--fbg-ticker-height);
   overflow: hidden;
@@ -31,6 +32,35 @@
   align-items: center;
   background: color-mix(in srgb, var(--fbg-primary) 18%, var(--fbg-bg-charcoal));
   border-bottom: 1px solid color-mix(in srgb, var(--fbg-primary) 35%, transparent);
+  transition: background 0.2s ease;
+}
+
+.demoTickerPulse {
+  background: color-mix(in srgb, var(--fbg-primary) 42%, var(--fbg-bg-charcoal));
+}
+
+.demoTickerPulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--fbg-primary) 70%, white) 50%,
+    transparent 100%
+  );
+  animation: fbg-demo-banner-wave 0.65s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes fbg-demo-banner-wave {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .demoTickerTrack {
@@ -71,6 +101,11 @@
 
   .demoTickerText:last-child {
     display: none;
+  }
+
+  .demoTickerPulse::after {
+    animation: none;
+    opacity: 0.6;
   }
 }
 
