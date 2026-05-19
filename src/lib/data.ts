@@ -15,6 +15,7 @@ import type {
   FeedItem,
   NoteItem,
   ReaderPayload,
+  ReaderVerse,
   SearchItem,
 } from "@/lib/types";
 

@@ -8,8 +8,10 @@ import BlurVerse from "@/components/fbg/blur-verse";
 import DiffFeedback from "@/components/fbg/diff-feedback";
 import styles from "@/components/fbg/fbg.module.css";
 import ListenButton from "@/components/fbg/ListenButton";
+import ReciteArabicButton from "@/components/fbg/ReciteArabicButton";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
 import ui from "@/components/fbg/ui/ui.module.css";
+import { normalizeArabic } from "@/lib/fbg/normalize-arabic";
 import { getSrsSession, type SrsSession } from "@/lib/fbg/store";
 
 export default function MemorizePage() {
@@ -18,6 +20,7 @@ export default function MemorizePage() {
 
   const [session, setSession] = useState<SrsSession | null>(null);
   const [recallText, setRecallText] = useState("");
+  const [recitedArabic, setRecitedArabic] = useState("");
   const [arabicRevealed, setArabicRevealed] = useState(false);
   const [translationRevealed, setTranslationRevealed] = useState(false);
 
@@ -74,7 +77,23 @@ export default function MemorizePage() {
 
       <div className={ui.actionStubRow}>
         <ListenButton verseKey={session.verseKey} />
+        <ReciteArabicButton onTranscript={setRecitedArabic} />
       </div>
+
+      <p className={ui.sectionLabel}>Recite to recall (Arabic)</p>
+      <p className={styles.meta}>
+        Tap Recite Arabic, recite the ayah, then tap Stop. Works best in Chrome with a
+        quiet room.
+      </p>
+      <DiffFeedback
+        actual={recitedArabic}
+        dir="rtl"
+        emptyHint="Your recitation will appear here after you stop recording."
+        expected={session.arabicText}
+        normalize={normalizeArabic}
+        remainingLabel="ayah"
+        scoreLabel="words"
+      />
 
       <p className={ui.sectionLabel}>Type to recall (translation)</p>
       <textarea
@@ -83,7 +102,11 @@ export default function MemorizePage() {
         placeholder="Type what you remember of the meaning…"
         value={recallText}
       />
-      <DiffFeedback actual={recallText} expected={session.translationText} />
+      <DiffFeedback
+        actual={recallText}
+        expected={session.translationText}
+        remainingLabel="translation"
+      />
     </>
   );
 }

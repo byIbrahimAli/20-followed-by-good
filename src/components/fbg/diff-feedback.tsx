@@ -1,67 +1,54 @@
 import styles from "./fbg.module.css";
+import { compareRecall } from "@/lib/fbg/compare-recall";
 
 interface DiffFeedbackProps {
   expected: string;
   actual: string;
+  dir?: "ltr" | "rtl" | "auto";
+  emptyHint?: string;
+  normalize?: (token: string) => string;
+  remainingLabel?: string;
+  scoreLabel?: string;
 }
 
-const tokenize = (value: string): string[] =>
-  value.trim().split(/\s+/).filter(Boolean);
+export default function DiffFeedback({
+  expected,
+  actual,
+  dir = "ltr",
+  emptyHint = "Type your recall above — matching words will highlight in green.",
+  normalize,
+  remainingLabel = "translation",
+  scoreLabel = "words",
+}: DiffFeedbackProps) {
+  const comparison = compareRecall(expected, actual, normalize);
 
-const normalizeToken = (token: string): string =>
-  token.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
-
-export default function DiffFeedback({ expected, actual }: DiffFeedbackProps) {
-  const expectedTokens = tokenize(expected);
-  const actualTokens = tokenize(actual);
-
-  if (actualTokens.length === 0) {
-    return (
-      <p className={styles.meta}>
-        Type your recall above — matching words will highlight in green.
-      </p>
-    );
+  if (comparison.actualTokens.length === 0) {
+    return <p className={styles.meta}>{emptyHint}</p>;
   }
-
-  let matches = 0;
-  for (let index = 0; index < actualTokens.length; index += 1) {
-    const expectedToken = expectedTokens[index];
-    if (
-      expectedToken &&
-      normalizeToken(expectedToken) === normalizeToken(actualTokens[index])
-    ) {
-      matches += 1;
-    }
-  }
-
-  const coverage =
-    expectedTokens.length > 0
-      ? Math.round((matches / expectedTokens.length) * 100)
-      : 0;
 
   return (
     <>
       <p className={styles.recallScore}>
-        {matches} of {expectedTokens.length} words match ({coverage}%)
+        {comparison.matchCount} of {comparison.expectedTokens.length} {scoreLabel}{" "}
+        match ({comparison.coveragePercent}%)
       </p>
-      <div className={styles.card}>
-        {actualTokens.map((token, index) => {
-          const match =
-            expectedTokens[index] &&
-            normalizeToken(expectedTokens[index]) === normalizeToken(token);
-          return (
-            <span
-              className={match ? styles.diffLineMatch : styles.diffLineMiss}
-              key={`${token}-${index}`}
-            >
-              {token}{" "}
-            </span>
-          );
-        })}
-        {actualTokens.length < expectedTokens.length ? (
+      <div className={styles.card} dir={dir}>
+        {comparison.actualTokens.map((token, index) => (
+          <span
+            className={
+              comparison.tokenMatches[index]
+                ? styles.diffLineMatch
+                : styles.diffLineMiss
+            }
+            key={`${token}-${index}`}
+          >
+            {token}{" "}
+          </span>
+        ))}
+        {comparison.actualTokens.length < comparison.expectedTokens.length ? (
           <p className={styles.meta}>
-            {expectedTokens.length - actualTokens.length} word(s) remaining in the
-            translation
+            {comparison.expectedTokens.length - comparison.actualTokens.length}{" "}
+            word(s) remaining in the {remainingLabel}
           </p>
         ) : null}
       </div>
