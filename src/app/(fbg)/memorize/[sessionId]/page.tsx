@@ -1,25 +1,25 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import BlurRevealText from "@/components/fbg/BlurRevealText";
 import BlurVerse from "@/components/fbg/blur-verse";
-import ListenButton from "@/components/fbg/ListenButton";
 import DiffFeedback from "@/components/fbg/diff-feedback";
 import styles from "@/components/fbg/fbg.module.css";
+import ListenButton from "@/components/fbg/ListenButton";
 import TopAppBar from "@/components/fbg/ui/TopAppBar";
 import ui from "@/components/fbg/ui/ui.module.css";
-import { gradeSession } from "@/lib/fbg/srs";
-import { getSrsSession, updateSrsSession, type SrsSession } from "@/lib/fbg/store";
+import { getSrsSession, type SrsSession } from "@/lib/fbg/store";
 
 export default function MemorizePage() {
   const params = useParams<{ sessionId: string }>();
-  const router = useRouter();
   const sessionId = params.sessionId;
 
   const [session, setSession] = useState<SrsSession | null>(null);
   const [recallText, setRecallText] = useState("");
-  const [revealAll, setRevealAll] = useState(false);
+  const [arabicRevealed, setArabicRevealed] = useState(false);
+  const [translationRevealed, setTranslationRevealed] = useState(false);
 
   useEffect(() => {
     if (!sessionId) {
@@ -28,74 +28,62 @@ export default function MemorizePage() {
     setSession(getSrsSession(sessionId));
   }, [sessionId]);
 
-  const applyGrade = (grade: "easy" | "hard") => {
-    if (!session) {
-      return;
-    }
-
-    const graded = gradeSession(session.intervalIndex, grade);
-    updateSrsSession(session.id, graded);
-    router.push("/");
-  };
-
   if (!session) {
     return <p className={styles.pageLead}>Session not found.</p>;
   }
 
   return (
     <>
-      <TopAppBar title="SRS session" />
+      <TopAppBar title="Memorize" />
 
       <section className={ui.srsCard}>
         <p className={styles.meta}>
           {session.surahName} · {session.verseKey}
         </p>
-        <BlurVerse revealAll={revealAll} text={session.arabicText} />
-        <p className={styles.translation}>{session.translationText}</p>
+        <BlurVerse revealedAll={arabicRevealed} text={session.arabicText} />
+        <BlurRevealText
+          className={styles.translation}
+          dir="ltr"
+          revealedAll={translationRevealed}
+          text={session.translationText}
+        />
       </section>
 
-      <p className={styles.meta}>Type to recall (translation)</p>
+      <div className={ui.actionStubRow}>
+        <button
+          className={ui.verseActionBtn}
+          onClick={() => setArabicRevealed((value) => !value)}
+          type="button"
+        >
+          <span className={`${ui.materialIcon} ${ui.verseActionIcon}`}>
+            {arabicRevealed ? "visibility_off" : "visibility"}
+          </span>
+          {arabicRevealed ? "Hide Arabic" : "Reveal Arabic"}
+        </button>
+        <button
+          className={ui.verseActionBtn}
+          onClick={() => setTranslationRevealed((value) => !value)}
+          type="button"
+        >
+          <span className={`${ui.materialIcon} ${ui.verseActionIcon}`}>
+            {translationRevealed ? "visibility_off" : "visibility"}
+          </span>
+          {translationRevealed ? "Hide translation" : "Reveal translation"}
+        </button>
+      </div>
+
+      <div className={ui.actionStubRow}>
+        <ListenButton verseKey={session.verseKey} />
+      </div>
+
+      <p className={ui.sectionLabel}>Type to recall (translation)</p>
       <textarea
         className={styles.textarea}
         onChange={(event) => setRecallText(event.target.value)}
-        placeholder="Type what you remember…"
+        placeholder="Type what you remember of the meaning…"
         value={recallText}
       />
       <DiffFeedback actual={recallText} expected={session.translationText} />
-
-      <div className={styles.actionRow}>
-        <ListenButton className={ui.stubBtn} verseKey={session.verseKey} />
-        <button
-          className={styles.secondaryButton}
-          onClick={() => setRevealAll(true)}
-          type="button"
-        >
-          Reveal all
-        </button>
-        <button
-          className={styles.primaryButton}
-          onClick={() => applyGrade("hard")}
-          type="button"
-        >
-          Hard
-        </button>
-        <button
-          className={styles.primaryButton}
-          onClick={() => applyGrade("easy")}
-          type="button"
-        >
-          Easy
-        </button>
-      </div>
-
-      <div className={ui.srsInputBar}>
-        <input
-          className={ui.srsInput}
-          disabled
-          placeholder="Recite or type your recall…"
-          type="text"
-        />
-      </div>
     </>
   );
 }

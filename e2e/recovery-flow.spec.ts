@@ -85,8 +85,9 @@ test.describe("recovery flow", () => {
 
     await page.getByRole("button", { name: "Begin memorizing" }).click();
 
-    await expect(page.getByText(/SRS session/i)).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: "Easy" }).click();
+    await expect(page.getByText(/^Memorize$/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("Type to recall (translation)")).toBeVisible();
+    await page.getByRole("link", { name: "Home" }).click();
 
     await expect(page.getByText(/What slipped today/i)).toBeVisible({
       timeout: 10_000,
