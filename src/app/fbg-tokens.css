@@ -1,5 +1,6 @@
-:root {
-  /* Stitch palette */
+/* Default — emerald night (current) */
+:root,
+[data-fbg-theme="default"] {
   --fbg-primary: #95d3ba;
   --fbg-primary-dim: #064e3b;
   --fbg-bg-night: #0a0a0a;
@@ -23,4 +24,88 @@
   --fbg-margin-mobile: 1rem;
   --fbg-shell-pad: 4rem;
   --fbg-nav-height: 3.5rem;
+}
+
+/* Warm light — cream paper & gold */
+[data-fbg-theme="warm-light"] {
+  --fbg-primary: #c5a059;
+  --fbg-primary-dim: #9a7a3c;
+  --fbg-bg-night: #e8e6dc;
+  --fbg-bg-base: #f2f2eb;
+  --fbg-bg-charcoal: #e8e6dc;
+  --fbg-surface-container: #faf9f4;
+  --fbg-bg-soft: #e3e1d6;
+  --fbg-fg-base: #1c1917;
+  --fbg-fg-muted: #78716c;
+  --fbg-emerald: #c5a059;
+  --fbg-emerald-soft: #d4b878;
+  --fbg-emerald-glow: rgba(197, 160, 89, 0.35);
+  --fbg-border-soft: rgba(28, 25, 23, 0.12);
+  --fbg-outline-variant: rgba(28, 25, 23, 0.2);
+  --fbg-error-container: rgba(185, 28, 28, 0.12);
+  --fbg-error-fg: #b91c1c;
+  --fbg-warn: #a16207;
+}
+
+/* Warm dark — evergreen & gold */
+[data-fbg-theme="warm-dark"] {
+  --fbg-primary: #c5a059;
+  --fbg-primary-dim: #8f7038;
+  --fbg-bg-night: #121610;
+  --fbg-bg-base: #1a1f16;
+  --fbg-bg-charcoal: #222a1e;
+  --fbg-surface-container: #252d20;
+  --fbg-bg-soft: #2c3526;
+  --fbg-fg-base: #f2f2eb;
+  --fbg-fg-muted: #b8b5a8;
+  --fbg-emerald: #c5a059;
+  --fbg-emerald-soft: #d9bc7a;
+  --fbg-emerald-glow: rgba(197, 160, 89, 0.28);
+  --fbg-border-soft: rgba(242, 242, 235, 0.12);
+  --fbg-outline-variant: rgba(242, 242, 235, 0.22);
+  --fbg-error-container: rgba(127, 29, 29, 0.45);
+  --fbg-error-fg: #fca5a5;
+  --fbg-warn: #d4a574;
+}
+
+/* Serenity light — slate & blue */
+[data-fbg-theme="serenity-light"] {
+  --fbg-primary: #2b7bb9;
+  --fbg-primary-dim: #1e5f94;
+  --fbg-bg-night: #e2e8f0;
+  --fbg-bg-base: #f0f4f8;
+  --fbg-bg-charcoal: #e8eef4;
+  --fbg-surface-container: #f8fafc;
+  --fbg-bg-soft: #dce4ec;
+  --fbg-fg-base: #0f172a;
+  --fbg-fg-muted: #64748b;
+  --fbg-emerald: #2b7bb9;
+  --fbg-emerald-soft: #5b9bd4;
+  --fbg-emerald-glow: rgba(43, 123, 185, 0.28);
+  --fbg-border-soft: rgba(15, 23, 42, 0.1);
+  --fbg-outline-variant: rgba(15, 23, 42, 0.18);
+  --fbg-error-container: rgba(185, 28, 28, 0.1);
+  --fbg-error-fg: #b91c1c;
+  --fbg-warn: #b45309;
+}
+
+/* Serenity dark — navy & teal */
+[data-fbg-theme="serenity-dark"] {
+  --fbg-primary: #26a69a;
+  --fbg-primary-dim: #1d857a;
+  --fbg-bg-night: #060d1a;
+  --fbg-bg-base: #0a192f;
+  --fbg-bg-charcoal: #112240;
+  --fbg-surface-container: #152a4a;
+  --fbg-bg-soft: #1a3358;
+  --fbg-fg-base: #e6f1ff;
+  --fbg-fg-muted: #8892b0;
+  --fbg-emerald: #26a69a;
+  --fbg-emerald-soft: #4db6ac;
+  --fbg-emerald-glow: rgba(38, 166, 154, 0.32);
+  --fbg-border-soft: rgba(230, 241, 255, 0.1);
+  --fbg-outline-variant: rgba(230, 241, 255, 0.2);
+  --fbg-error-container: rgba(127, 29, 29, 0.45);
+  --fbg-error-fg: #fca5a5;
+  --fbg-warn: #d4a574;
 }

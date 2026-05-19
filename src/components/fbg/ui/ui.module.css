@@ -43,6 +43,123 @@
   cursor: pointer;
   flex-shrink: 0;
   text-decoration: none;
+  padding: 0;
+}
+
+.themeMenuBtn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--fbg-outline-variant);
+  background: var(--fbg-bg-soft);
+  color: var(--fbg-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.themeMenuIcon {
+  display: block;
+}
+
+.profileMenuRoot {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profileMenuPanel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 50;
+  width: min(18rem, calc(100vw - 2rem));
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid var(--fbg-outline-variant);
+  border-radius: var(--fbg-radius-card);
+  padding: 0.85rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.profileMenuHeading {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fbg-fg-muted);
+  margin: 0 0 0.65rem;
+}
+
+.themeOptionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.themeOptionBtn,
+.themeOptionBtnActive {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid var(--fbg-outline-variant);
+  border-radius: 14px;
+  padding: 0.55rem 0.65rem;
+  background: transparent;
+  color: var(--fbg-fg-base);
+  cursor: pointer;
+  text-align: left;
+}
+
+.themeOptionBtnActive {
+  border-color: color-mix(in srgb, var(--fbg-primary) 50%, var(--fbg-outline-variant));
+  background: color-mix(in srgb, var(--fbg-primary) 10%, transparent);
+}
+
+.themeSwatch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--fbg-outline-variant);
+}
+
+.themeSwatchTone,
+.themeSwatchAccent {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.themeOptionCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.themeOptionLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.themeOptionDesc {
+  font-size: 0.68rem;
+  color: var(--fbg-fg-muted);
+  line-height: 1.3;
+}
+
+.themeOptionCheck {
+  font-size: 1.1rem;
+  color: var(--fbg-primary);
+  flex-shrink: 0;
 }
 
 .glassCard {
