@@ -233,17 +233,150 @@
   letter-spacing: 0.02em;
 }
 
+.queueSection {
+  margin-bottom: var(--fbg-section-gap);
+}
+
+.queueSection .segmentTabBar {
+  margin-bottom: 0.85rem;
+}
+
 .reviewList {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-bottom: var(--fbg-section-gap);
+  margin-bottom: 0;
 }
 
 .reviewList .reviewCard {
   flex: none;
   max-width: none;
   width: 100%;
+}
+
+.turningPointsCard {
+  background: var(--fbg-bg-charcoal);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 22%, transparent);
+  border-radius: var(--fbg-radius-card);
+  padding: 1.25rem 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.turningPointsTitle {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35rem;
+  color: var(--fbg-fg-base);
+}
+
+.turningPointsSubtitle {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--fbg-fg-muted);
+  margin: 0 0 1rem;
+}
+
+.turningPointsStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.turningPointsStat {
+  background: var(--fbg-bg-soft);
+  border: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 18%, transparent);
+  border-radius: 16px;
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+}
+
+.turningPointsStatValue {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0;
+  color: var(--fbg-fg-base);
+}
+
+.turningPointsStatLabel {
+  font-size: 0.65rem;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  color: var(--fbg-fg-muted);
+  margin: 0.35rem 0 0;
+}
+
+.turningPointsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.turningPointsRow {
+  border-top: 1px solid color-mix(in srgb, var(--fbg-outline-variant) 25%, transparent);
+}
+
+.turningPointsRow:first-child {
+  border-top: none;
+}
+
+.turningPointsLink {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.15rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.turningPointsIcon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+}
+
+.turningPointsIcon .materialIcon {
+  font-size: 1.35rem;
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24;
+}
+
+.turningPointsText {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  min-width: 0;
+}
+
+.turningPointsCategory {
+  color: var(--fbg-fg-base);
+  font-weight: 500;
+}
+
+.turningPointsArrow,
+.turningPointsDot {
+  color: var(--fbg-fg-muted);
+}
+
+.turningPointsReference {
+  color: var(--fbg-fg-base);
+}
+
+.turningPointsStatusMemorized {
+  color: var(--fbg-primary);
+}
+
+.turningPointsStatusReview {
+  color: var(--fbg-warn);
+}
+
+.turningPointsEmpty {
+  font-size: 0.8rem;
+  color: var(--fbg-fg-muted);
+  margin: 0;
+  padding-top: 0.25rem;
 }
 
 .metricsRow {

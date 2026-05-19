@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildReviewItems,
-  computeReviewMetrics,
-  type ReviewItem,
-} from "@/lib/fbg/review-items";
+import { buildMemorizedItems, buildReviewItems } from "@/lib/fbg/review-items";
 import { maxSrsIntervalIndex } from "@/lib/fbg/srs";
 import type { Assignment, SrsSession } from "@/lib/fbg/store";
 
@@ -27,6 +23,7 @@ const baseAssignment: Assignment = {
 const baseSession: SrsSession = {
   id: "s1",
   verseKey: "41:34",
+  assignmentId: "a1",
   arabicText: "test",
   translationText: "test",
   surahName: "Fussilat",
@@ -39,56 +36,75 @@ const baseSession: SrsSession = {
 describe("buildReviewItems", () => {
   it("includes due sessions and pending assignments", () => {
     const items = buildReviewItems([baseAssignment], [baseSession]);
-    expect(items).toHaveLength(2);
+    expect(items).toHaveLength(1);
     expect(items[0].href).toBe("/memorize/s1");
     expect(items[0].memorized).toBe(false);
-    expect(items[1].href).toBe("/recover/assign?id=a1");
-    expect(items[1].memorized).toBe(false);
   });
 
-  it("marks mastered sessions", () => {
+  it("excludes mastered sessions and assignments from the queue", () => {
     const mastered: SrsSession = {
       ...baseSession,
       intervalIndex: maxSrsIntervalIndex(),
+      nextDue: "2099-01-01",
     };
-    const items = buildReviewItems([], [mastered]);
-    expect(items[0].memorized).toBe(true);
+    const items = buildReviewItems(
+      [{ ...baseAssignment, status: "done" }],
+      [mastered],
+    );
+    expect(items).toHaveLength(0);
+  });
+
+  it("excludes memorizing assignment when its session is mastered", () => {
+    const items = buildReviewItems(
+      [{ ...baseAssignment, status: "memorizing" }],
+      [{ ...baseSession, intervalIndex: maxSrsIntervalIndex(), nextDue: "2099-01-01" }],
+    );
+    expect(items).toHaveLength(0);
   });
 });
 
-describe("computeReviewMetrics", () => {
-  it("returns zeros when empty", () => {
-    expect(computeReviewMetrics([])).toEqual({
-      totalInReview: 0,
-      memorizedCount: 0,
-      learningCount: 0,
-      nextUp: null,
-    });
+describe("buildMemorizedItems", () => {
+  it("includes mastered sessions and done assignments", () => {
+    const mastered: SrsSession = {
+      ...baseSession,
+      intervalIndex: maxSrsIntervalIndex(),
+      nextDue: "2099-01-01",
+    };
+    const items = buildMemorizedItems(
+      [{ ...baseAssignment, status: "done" }],
+      [mastered],
+    );
+    expect(items).toHaveLength(1);
+    expect(items[0].memorized).toBe(true);
+    expect(items[0].href).toBe("/memorize/s1");
   });
 
-  it("counts memorized vs learning and picks next learning item due today", () => {
-    const items: ReviewItem[] = [
-      {
-        href: "/a",
-        id: "1",
-        memorized: true,
-        subtitle: "a",
-        title: "A",
-        nextDue: "2099-01-01",
-      },
-      {
-        href: "/b",
-        id: "2",
-        memorized: false,
-        subtitle: "b",
-        title: "B",
-        nextDue: today,
-      },
-    ];
-    const metrics = computeReviewMetrics(items);
-    expect(metrics.totalInReview).toBe(2);
-    expect(metrics.memorizedCount).toBe(1);
-    expect(metrics.learningCount).toBe(1);
-    expect(metrics.nextUp?.id).toBe("2");
+  it("dedupes multiple mastered sessions for the same ayah", () => {
+    const mastered = {
+      intervalIndex: maxSrsIntervalIndex(),
+      nextDue: "2099-01-01",
+    };
+    const items = buildMemorizedItems(
+      [{ ...baseAssignment, status: "done" }],
+      [
+        { ...baseSession, id: "s1", createdAt: `${today}T10:00:00.000Z`, ...mastered },
+        {
+          ...baseSession,
+          id: "s2",
+          assignmentId: "a1",
+          createdAt: `${today}T12:00:00.000Z`,
+          ...mastered,
+        },
+        {
+          ...baseSession,
+          id: "s3",
+          assignmentId: undefined,
+          createdAt: `${today}T11:00:00.000Z`,
+          ...mastered,
+        },
+      ],
+    );
+    expect(items).toHaveLength(1);
+    expect(items[0].id).toBe("s2");
   });
 });

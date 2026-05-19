@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { getStore, seedDemoIfNeeded, type Assignment, type SrsSession } from "@/lib/fbg/store";
+import {
+  getStore,
+  seedDemoIfNeeded,
+  STORE_UPDATED_EVENT,
+  type Assignment,
+  type SrsSession,
+} from "@/lib/fbg/store";
 
 export const useStoreSync = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -20,12 +26,15 @@ export const useStoreSync = () => {
 
     const onFocus = () => refresh();
     const onStorage = () => refresh();
+    const onStoreUpdated = () => refresh();
 
     window.addEventListener("focus", onFocus);
     window.addEventListener("storage", onStorage);
+    window.addEventListener(STORE_UPDATED_EVENT, onStoreUpdated);
     return () => {
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener(STORE_UPDATED_EVENT, onStoreUpdated);
     };
   }, [refresh]);
 

@@ -125,12 +125,15 @@ const readStore = (): FbgStore => {
   }
 };
 
+export const STORE_UPDATED_EVENT = "fbg-store-updated";
+
 const writeStore = (store: FbgStore): void => {
   if (typeof window === "undefined") {
     return;
   }
 
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  window.dispatchEvent(new CustomEvent(STORE_UPDATED_EVENT));
 };
 
 export const getStore = (): FbgStore => readStore();
